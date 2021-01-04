@@ -1,0 +1,6 @@
+package.json
+package-lock.json
+public
+src/graphql
+src/aws-exports.js
+amplify/backend/function/**/src/index.js

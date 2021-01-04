@@ -1,0 +1,43 @@
+enum ItemModelType {
+  ITEM
+}
+type Item
+  @model
+  @auth(rules: [{ allow: private }])
+  @key(
+    name: "itemsByModelTypeCreatedAt"
+    fields: ["modelType", "createdAt"]
+    queryField: "listItemsSortedByCreatedAt"
+  ) {
+  id: ID!
+  name: String!
+  price: Int!
+  quantity: Int!
+  modelType: ItemModelType!
+  createdAt: AWSDateTime!
+}
+
+enum TransactionModelType {
+  TRANSACTION
+}
+enum TransactionType {
+  IN
+  OUT
+}
+type Transaction
+  @model
+  @auth(rules: [{ allow: private }])
+  @key(
+    name: "transactionsByModelTypeCreatedAt"
+    fields: ["modelType", "createdAt"]
+    queryField: "listTransactionsSortedByCreatedAt"
+  ) {
+  id: ID!
+  itemId: ID!
+  quantity: Int!
+  price: Int!
+  type: TransactionType!
+  modelType: TransactionModelType!
+  createdAt: AWSDateTime!
+  item: Item @connection(fields: ["itemId"])
+}
