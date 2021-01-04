@@ -9,7 +9,19 @@
     "amplify/backend/awscloudformation": true
   },
   "cSpell.words": [
+    "L",
+    "Lịch",
+    "Nh",
+    "Nhập",
+    "Xu",
+    "Xuất",
+    "ch",
     "flowtype",
+    "l",
+    "lượng",
+    "ng",
+    "p",
+    "t",
     "vercel"
   ],
   "editor.formatOnSave": true

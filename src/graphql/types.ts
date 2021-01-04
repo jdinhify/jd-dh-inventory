@@ -9,6 +9,7 @@ export type CreateItemInput = {
   quantity: number,
   modelType: ItemModelType,
   createdAt?: string | null,
+  searchField: string,
 };
 
 export enum ItemModelType {
@@ -22,6 +23,7 @@ export type ModelItemConditionInput = {
   quantity?: ModelIntInput | null,
   modelType?: ModelItemModelTypeInput | null,
   createdAt?: ModelStringInput | null,
+  searchField?: ModelStringInput | null,
   and?: Array< ModelItemConditionInput | null > | null,
   or?: Array< ModelItemConditionInput | null > | null,
   not?: ModelItemConditionInput | null,
@@ -91,6 +93,7 @@ export type UpdateItemInput = {
   quantity?: number | null,
   modelType?: ItemModelType | null,
   createdAt?: string | null,
+  searchField?: string | null,
 };
 
 export type DeleteItemInput = {
@@ -105,6 +108,7 @@ export type CreateTransactionInput = {
   type: TransactionType,
   modelType: TransactionModelType,
   createdAt?: string | null,
+  searchField: string,
 };
 
 export enum TransactionType {
@@ -125,6 +129,7 @@ export type ModelTransactionConditionInput = {
   type?: ModelTransactionTypeInput | null,
   modelType?: ModelTransactionModelTypeInput | null,
   createdAt?: ModelStringInput | null,
+  searchField?: ModelStringInput | null,
   and?: Array< ModelTransactionConditionInput | null > | null,
   or?: Array< ModelTransactionConditionInput | null > | null,
   not?: ModelTransactionConditionInput | null,
@@ -164,6 +169,7 @@ export type UpdateTransactionInput = {
   type?: TransactionType | null,
   modelType?: TransactionModelType | null,
   createdAt?: string | null,
+  searchField?: string | null,
 };
 
 export type DeleteTransactionInput = {
@@ -177,6 +183,7 @@ export type ModelItemFilterInput = {
   quantity?: ModelIntInput | null,
   modelType?: ModelItemModelTypeInput | null,
   createdAt?: ModelStringInput | null,
+  searchField?: ModelStringInput | null,
   and?: Array< ModelItemFilterInput | null > | null,
   or?: Array< ModelItemFilterInput | null > | null,
   not?: ModelItemFilterInput | null,
@@ -190,6 +197,7 @@ export type ModelTransactionFilterInput = {
   type?: ModelTransactionTypeInput | null,
   modelType?: ModelTransactionModelTypeInput | null,
   createdAt?: ModelStringInput | null,
+  searchField?: ModelStringInput | null,
   and?: Array< ModelTransactionFilterInput | null > | null,
   or?: Array< ModelTransactionFilterInput | null > | null,
   not?: ModelTransactionFilterInput | null,
@@ -225,6 +233,7 @@ export type CreateItemMutation = {
     quantity: number,
     modelType: ItemModelType,
     createdAt: string,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -243,6 +252,7 @@ export type UpdateItemMutation = {
     quantity: number,
     modelType: ItemModelType,
     createdAt: string,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -261,6 +271,7 @@ export type DeleteItemMutation = {
     quantity: number,
     modelType: ItemModelType,
     createdAt: string,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -288,8 +299,10 @@ export type CreateTransactionMutation = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -317,8 +330,10 @@ export type UpdateTransactionMutation = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -346,8 +361,10 @@ export type DeleteTransactionMutation = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -365,6 +382,7 @@ export type GetItemQuery = {
     quantity: number,
     modelType: ItemModelType,
     createdAt: string,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -386,6 +404,7 @@ export type ListItemsQuery = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null > | null,
     nextToken: string | null,
@@ -414,8 +433,10 @@ export type GetTransactionQuery = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -438,6 +459,7 @@ export type ListTransactionsQuery = {
       type: TransactionType,
       modelType: TransactionModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null > | null,
     nextToken: string | null,
@@ -464,6 +486,7 @@ export type ListItemsSortedByCreatedAtQuery = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null > | null,
     nextToken: string | null,
@@ -491,6 +514,7 @@ export type ListTransactionsSortedByCreatedAtQuery = {
       type: TransactionType,
       modelType: TransactionModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null > | null,
     nextToken: string | null,
@@ -506,6 +530,7 @@ export type OnCreateItemSubscription = {
     quantity: number,
     modelType: ItemModelType,
     createdAt: string,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -519,6 +544,7 @@ export type OnUpdateItemSubscription = {
     quantity: number,
     modelType: ItemModelType,
     createdAt: string,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -532,6 +558,7 @@ export type OnDeleteItemSubscription = {
     quantity: number,
     modelType: ItemModelType,
     createdAt: string,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -554,8 +581,10 @@ export type OnCreateTransactionSubscription = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -578,8 +607,10 @@ export type OnUpdateTransactionSubscription = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null,
+    searchField: string,
     updatedAt: string,
   } | null,
 };
@@ -602,8 +633,10 @@ export type OnDeleteTransactionSubscription = {
       quantity: number,
       modelType: ItemModelType,
       createdAt: string,
+      searchField: string,
       updatedAt: string,
     } | null,
+    searchField: string,
     updatedAt: string,
   } | null,
 };

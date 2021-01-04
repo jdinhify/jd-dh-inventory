@@ -11,6 +11,7 @@ export const onCreateItem = /* GraphQL */ `
       quantity
       modelType
       createdAt
+      searchField
       updatedAt
     }
   }
@@ -24,6 +25,7 @@ export const onUpdateItem = /* GraphQL */ `
       quantity
       modelType
       createdAt
+      searchField
       updatedAt
     }
   }
@@ -37,6 +39,7 @@ export const onDeleteItem = /* GraphQL */ `
       quantity
       modelType
       createdAt
+      searchField
       updatedAt
     }
   }
@@ -58,8 +61,10 @@ export const onCreateTransaction = /* GraphQL */ `
         quantity
         modelType
         createdAt
+        searchField
         updatedAt
       }
+      searchField
       updatedAt
     }
   }
@@ -81,8 +86,10 @@ export const onUpdateTransaction = /* GraphQL */ `
         quantity
         modelType
         createdAt
+        searchField
         updatedAt
       }
+      searchField
       updatedAt
     }
   }
@@ -104,8 +111,10 @@ export const onDeleteTransaction = /* GraphQL */ `
         quantity
         modelType
         createdAt
+        searchField
         updatedAt
       }
+      searchField
       updatedAt
     }
   }

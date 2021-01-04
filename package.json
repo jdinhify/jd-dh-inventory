@@ -33,6 +33,7 @@
     "next": "^10.0.4",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
+    "react-icons": "^4.1.0",
     "react-query": "^3.5.9"
   },
   "devDependencies": {
