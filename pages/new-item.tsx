@@ -2,14 +2,14 @@ import { Link } from 'src/components/link'
 import { SEO } from 'src/components/seo'
 import { withAuth } from 'src/components/with-auth'
 
-const Home = () => (
+const NewItem = () => (
   <>
-    <SEO title="Home" />
-    <div>Home</div>
+    <SEO title="NewItem" />
+    <div>New item</div>
     <div>
-      <Link href="/new-item">New item</Link>
+      <Link href="/">Home</Link>
     </div>
   </>
 )
 
-export default withAuth(Home)
+export default withAuth(NewItem)

@@ -3,7 +3,11 @@ enum ItemModelType {
 }
 type Item
   @model
-  @auth(rules: [{ allow: private }])
+  @auth(
+    rules: [
+      { allow: groups, groups: ["AppUser"], operations: [create, read, update] }
+    ]
+  )
   @key(
     name: "itemsByModelTypeCreatedAt"
     fields: ["modelType", "createdAt"]
@@ -26,7 +30,11 @@ enum TransactionType {
 }
 type Transaction
   @model
-  @auth(rules: [{ allow: private }])
+  @auth(
+    rules: [
+      { allow: groups, groups: ["AppUser"], operations: [create, read, update] }
+    ]
+  )
   @key(
     name: "transactionsByModelTypeCreatedAt"
     fields: ["modelType", "createdAt"]
