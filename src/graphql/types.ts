@@ -100,15 +100,15 @@ export type DeleteItemInput = {
   id?: string | null,
 };
 
-export type CreateTransactionInput = {
-  id?: string | null,
-  itemId: string,
-  quantity: number,
-  price: number,
-  type: TransactionType,
-  modelType: TransactionModelType,
+export type UpdateTransactionInput = {
+  id: string,
+  itemId?: string | null,
+  quantity?: number | null,
+  price?: number | null,
+  type?: TransactionType | null,
+  modelType?: TransactionModelType | null,
   createdAt?: string | null,
-  searchField: string,
+  searchField?: string | null,
 };
 
 export enum TransactionType {
@@ -161,19 +161,19 @@ export type ModelTransactionModelTypeInput = {
   ne?: TransactionModelType | null,
 };
 
-export type UpdateTransactionInput = {
-  id: string,
-  itemId?: string | null,
-  quantity?: number | null,
-  price?: number | null,
-  type?: TransactionType | null,
-  modelType?: TransactionModelType | null,
-  createdAt?: string | null,
-  searchField?: string | null,
-};
-
 export type DeleteTransactionInput = {
   id?: string | null,
+};
+
+export type CreateTransactionInput = {
+  id?: string | null,
+  itemId: string,
+  quantity: number,
+  price: number,
+  type: TransactionType,
+  modelType: TransactionModelType,
+  createdAt?: string | null,
+  searchField: string,
 };
 
 export type ModelItemFilterInput = {
@@ -276,37 +276,6 @@ export type DeleteItemMutation = {
   } | null,
 };
 
-export type CreateTransactionMutationVariables = {
-  input: CreateTransactionInput,
-  condition?: ModelTransactionConditionInput | null,
-};
-
-export type CreateTransactionMutation = {
-  createTransaction:  {
-    __typename: "Transaction",
-    id: string,
-    itemId: string,
-    quantity: number,
-    price: number,
-    type: TransactionType,
-    modelType: TransactionModelType,
-    createdAt: string,
-    item:  {
-      __typename: "Item",
-      id: string,
-      name: string,
-      price: number,
-      quantity: number,
-      modelType: ItemModelType,
-      createdAt: string,
-      searchField: string,
-      updatedAt: string,
-    } | null,
-    searchField: string,
-    updatedAt: string,
-  } | null,
-};
-
 export type UpdateTransactionMutationVariables = {
   input: UpdateTransactionInput,
   condition?: ModelTransactionConditionInput | null,
@@ -345,6 +314,37 @@ export type DeleteTransactionMutationVariables = {
 
 export type DeleteTransactionMutation = {
   deleteTransaction:  {
+    __typename: "Transaction",
+    id: string,
+    itemId: string,
+    quantity: number,
+    price: number,
+    type: TransactionType,
+    modelType: TransactionModelType,
+    createdAt: string,
+    item:  {
+      __typename: "Item",
+      id: string,
+      name: string,
+      price: number,
+      quantity: number,
+      modelType: ItemModelType,
+      createdAt: string,
+      searchField: string,
+      updatedAt: string,
+    } | null,
+    searchField: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type CreateTransactionMutationVariables = {
+  input: CreateTransactionInput,
+  condition?: ModelTransactionConditionInput | null,
+};
+
+export type CreateTransactionMutation = {
+  createTransaction:  {
     __typename: "Transaction",
     id: string,
     itemId: string,

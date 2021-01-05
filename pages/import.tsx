@@ -11,7 +11,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { PageSection } from 'src/components/page-section'
 import { SEO } from 'src/components/seo'
 import { withAuth } from 'src/components/with-auth'
@@ -21,21 +21,46 @@ import { PageLayout } from 'src/components/page-layout'
 import { sharedText } from 'src/shared/text'
 import { H2 } from 'src/components/heading'
 import { useForm } from 'react-hook-form'
-import { ItemModelType } from 'src/graphql/types'
+import {
+  CreateItemMutation,
+  CreateItemMutationVariables,
+  ItemModelType,
+} from 'src/graphql/types'
 import { getTextWithoutAccents } from 'src/shared/get-text-without-accents'
+import { gqlOp } from 'src/shared/gql-op'
+import { createItem } from 'src/graphql/mutations'
+import { useMutation } from 'react-query'
 
 const NewItemForm = () => {
-  const { register, errors, handleSubmit, getValues } = useForm<{
+  const {
+    register,
+    errors,
+    handleSubmit,
+    getValues,
+    reset: formReset,
+  } = useForm<{
     name: string
     quantity: number
     price: number
   }>()
+  const { mutate, status: mutationStatus, reset: mutationReset } = useMutation(
+    (input: CreateItemMutationVariables['input']) =>
+      gqlOp<CreateItemMutation, CreateItemMutationVariables>(createItem, {
+        input,
+      }),
+  )
 
-  const onSubmit = () => {
+  useEffect(() => {
+    if (mutationStatus === 'success') {
+      formReset()
+      mutationReset()
+    }
+  }, [mutationStatus, formReset, mutationReset])
+
+  const onSubmit = async () => {
     const values = getValues()
-
     const item = {
-      type: ItemModelType.ITEM,
+      modelType: ItemModelType.ITEM,
       name: values.name,
       price: values.price,
       quantity: values.quantity,
@@ -43,7 +68,7 @@ const NewItemForm = () => {
         values.price
       }`,
     }
-    console.log(item)
+    mutationStatus === 'idle' && mutate(item)
   }
 
   return (
@@ -82,7 +107,9 @@ const NewItemForm = () => {
           </FormControl>
         </Stack>
         <Box>
-          <Button type="submit">{sharedText.Import}</Button>
+          <Button type="submit" isLoading={mutationStatus === 'loading'}>
+            {sharedText.Import}
+          </Button>
         </Box>
       </Stack>
     </form>

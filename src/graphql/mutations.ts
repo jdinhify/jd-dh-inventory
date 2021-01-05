@@ -53,34 +53,6 @@ export const deleteItem = /* GraphQL */ `
     }
   }
 `;
-export const createTransaction = /* GraphQL */ `
-  mutation CreateTransaction(
-    $input: CreateTransactionInput!
-    $condition: ModelTransactionConditionInput
-  ) {
-    createTransaction(input: $input, condition: $condition) {
-      id
-      itemId
-      quantity
-      price
-      type
-      modelType
-      createdAt
-      item {
-        id
-        name
-        price
-        quantity
-        modelType
-        createdAt
-        searchField
-        updatedAt
-      }
-      searchField
-      updatedAt
-    }
-  }
-`;
 export const updateTransaction = /* GraphQL */ `
   mutation UpdateTransaction(
     $input: UpdateTransactionInput!
@@ -115,6 +87,34 @@ export const deleteTransaction = /* GraphQL */ `
     $condition: ModelTransactionConditionInput
   ) {
     deleteTransaction(input: $input, condition: $condition) {
+      id
+      itemId
+      quantity
+      price
+      type
+      modelType
+      createdAt
+      item {
+        id
+        name
+        price
+        quantity
+        modelType
+        createdAt
+        searchField
+        updatedAt
+      }
+      searchField
+      updatedAt
+    }
+  }
+`;
+export const createTransaction = /* GraphQL */ `
+  mutation CreateTransaction(
+    $input: CreateTransactionInput!
+    $condition: ModelTransactionConditionInput
+  ) {
+    createTransaction(input: $input, condition: $condition) {
       id
       itemId
       quantity

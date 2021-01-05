@@ -1,0 +1,52 @@
+{
+  "Records": [
+    {
+      "eventID": "998518e16286d668268d9d4dce839e5b",
+      "eventName": "INSERT",
+      "eventVersion": "1.1",
+      "eventSource": "aws:dynamodb",
+      "awsRegion": "ap-southeast-1",
+      "dynamodb": {
+        "ApproximateCreationDateTime": 1609833146,
+        "Keys": {
+          "id": {
+            "S": "aecfff8b-dcaa-4fc8-8446-834ae0187062"
+          }
+        },
+        "NewImage": {
+          "createdAt": {
+            "S": "2021-01-05T07:52:26.394Z"
+          },
+          "quantity": {
+            "N": "100"
+          },
+          "searchField": {
+            "S": "muc in 2 201"
+          },
+          "price": {
+            "N": "201"
+          },
+          "__typename": {
+            "S": "Item"
+          },
+          "name": {
+            "S": "Mực in 2"
+          },
+          "id": {
+            "S": "aecfff8b-dcaa-4fc8-8446-834ae0187062"
+          },
+          "modelType": {
+            "S": "ITEM"
+          },
+          "updatedAt": {
+            "S": "2021-01-05T07:52:26.394Z"
+          }
+        },
+        "SequenceNumber": "5460100000000003347810117",
+        "SizeBytes": 224,
+        "StreamViewType": "NEW_AND_OLD_IMAGES"
+      },
+      "eventSourceARN": "arn:aws:dynamodb:ap-southeast-1:648373504731:table/Item-ucoc22jla5bpdlmyhyoykhjlq4-dev/stream/2021-01-04T02:41:55.410"
+    }
+  ]
+}
