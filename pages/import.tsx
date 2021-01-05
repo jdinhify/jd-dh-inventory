@@ -8,10 +8,13 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  InputGroup,
+  InputRightElement,
+  Spinner,
   Stack,
   Text,
 } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { PageSection } from 'src/components/page-section'
 import { SEO } from 'src/components/seo'
 import { withAuth } from 'src/components/with-auth'
@@ -25,13 +28,37 @@ import {
   CreateItemMutation,
   CreateItemMutationVariables,
   ItemModelType,
+  ListItemsSortedByCreatedAtQuery,
+  ListItemsSortedByCreatedAtQueryVariables,
+  ModelSortDirection,
+  PageImportCreateTransactionMutation,
+  PageImportCreateTransactionMutationVariables,
+  PageImportUpdateItemMutation,
+  PageImportUpdateItemMutationVariables,
+  TransactionModelType,
+  TransactionType,
 } from 'src/graphql/types'
 import { getTextWithoutAccents } from 'src/shared/get-text-without-accents'
 import { gqlOp } from 'src/shared/gql-op'
 import { createItem } from 'src/graphql/mutations'
-import { useMutation } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import {
+  pageImportCreateTransaction,
+  pageImportUpdateItem,
+} from 'src/graphql/page-import'
+import { listItemsSortedByCreatedAt } from 'src/graphql/queries'
+import { debounce } from 'lodash'
+
+const importItemListQueryKey = 'list-items'
+
+const text = {
+  'Import more': 'Nhập thêm',
+  'Additional quantity': 'Số lượng thêm',
+  Inventory: 'Kho',
+}
 
 const NewItemForm = () => {
+  const queryClient = useQueryClient()
   const {
     register,
     errors,
@@ -52,10 +79,11 @@ const NewItemForm = () => {
 
   useEffect(() => {
     if (mutationStatus === 'success') {
+      queryClient.invalidateQueries(importItemListQueryKey)
       formReset()
       mutationReset()
     }
-  }, [mutationStatus, formReset, mutationReset])
+  }, [mutationStatus, formReset, mutationReset, queryClient])
 
   const onSubmit = async () => {
     const values = getValues()
@@ -135,69 +163,155 @@ const NewItem = () => (
   </Accordion>
 )
 
-const Item = () => (
-  <AccordionItem
-    marginBottom="4"
-    borderWidth="1px"
-    borderRadius="5px"
-    borderColor="gray.400"
-  >
-    <AccordionButton
-      padding={0}
-      border="0"
-      borderTopRadius="5px"
-      _expanded={{ backgroundColor: 'gray.100' }}
-    >
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        padding="4"
-        width="100%"
-      >
-        <Text>{sharedText['Printer ink']}</Text>
-        <Text paddingRight="2" paddingLeft="2">
-          150K
-        </Text>{' '}
-        <Text>(13)</Text>
-      </Box>
-    </AccordionButton>
-    <AccordionPanel>
-      <Stack spacing="4">
-        <Stack direction="row">
-          <FormControl id="quantity">
-            <FormLabel>{sharedText.Quantity}</FormLabel>
-            <Input type="number" placeholder="10" />
-          </FormControl>
-          <FormControl id="price">
-            <FormLabel>{sharedText.Price} (K)</FormLabel>
-            <Input type="number" placeholder="150" />
-          </FormControl>
-        </Stack>
-        <Box>
-          <Button>{sharedText.Export}</Button>
-        </Box>
-      </Stack>
-    </AccordionPanel>
-  </AccordionItem>
-)
+const Item: FC<{
+  id: string
+  name: string
+  quantity: number
+  price: number
+  searchField: string
+}> = ({ id, name, quantity, price, searchField }) => {
+  const queryClient = useQueryClient()
+  const [additionalQuantity, setAdditionalQuantity] = useState<string>('')
+  const { status, reset, mutate } = useMutation(() => {
+    return Promise.all([
+      gqlOp<
+        PageImportCreateTransactionMutation,
+        PageImportCreateTransactionMutationVariables
+      >(pageImportCreateTransaction, {
+        input: {
+          itemId: id,
+          modelType: TransactionModelType.TRANSACTION,
+          price: price,
+          quantity: Number(additionalQuantity),
+          searchField,
+          type: TransactionType.IN,
+        },
+      }),
+      gqlOp<
+        PageImportUpdateItemMutation,
+        PageImportUpdateItemMutationVariables
+      >(pageImportUpdateItem, {
+        input: {
+          id,
+          quantity: quantity + Number(additionalQuantity),
+        },
+      }),
+    ])
+  })
 
-const ItemList = () => (
-  <Box>
-    <FormControl id="search" marginBottom="4">
-      <FormLabel>{sharedText.Search}</FormLabel>
-      <Input type="text" placeholder={`${sharedText['Printer ink']} 150`} />
-    </FormControl>
-    <Accordion allowMultiple>
-      <Item />
-      <Item />
-      <Item />
-      <Item />
-      <Item />
-      <Item />
-      <Item />
-    </Accordion>
-  </Box>
-)
+  useEffect(() => {
+    if (status === 'success') {
+      queryClient.invalidateQueries(importItemListQueryKey)
+      setAdditionalQuantity('')
+      reset()
+    }
+  }, [queryClient, reset, status])
+
+  const onSubmit = () => {
+    mutate()
+  }
+
+  return (
+    <AccordionItem
+      marginBottom="4"
+      borderWidth="1px"
+      borderRadius="5px"
+      borderColor="gray.400"
+    >
+      <AccordionButton
+        padding={0}
+        border="0"
+        borderTopRadius="5px"
+        _expanded={{ backgroundColor: 'gray.100' }}
+      >
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          padding="4"
+          width="100%"
+        >
+          <Box display="flex">
+            <Text>{name}</Text>
+            <Text paddingRight="2" paddingLeft="2">
+              - {`${price}K`}
+            </Text>{' '}
+          </Box>
+          <Text>({quantity})</Text>
+        </Box>
+      </AccordionButton>
+      <AccordionPanel>
+        <Stack spacing="4">
+          <Stack direction="row" alignItems="flex-end">
+            <FormControl id={`${id}-quantity`}>
+              <FormLabel>{text['Additional quantity']}</FormLabel>
+              <Input
+                type="number"
+                placeholder="10"
+                onChange={(e) => setAdditionalQuantity(e.target.value)}
+                value={additionalQuantity}
+              />
+            </FormControl>
+            <Box>
+              <Button
+                isDisabled={additionalQuantity.trim().length === 0}
+                isLoading={status === 'loading'}
+                onClick={onSubmit}
+              >
+                {text['Import more']}
+              </Button>
+            </Box>
+          </Stack>
+        </Stack>
+      </AccordionPanel>
+    </AccordionItem>
+  )
+}
+
+const ItemList = () => {
+  const [searchValue, setSearchValue] = useState('')
+  const { data, status, refetch, isFetching } = useQuery(
+    importItemListQueryKey,
+    () =>
+      gqlOp<
+        ListItemsSortedByCreatedAtQuery,
+        ListItemsSortedByCreatedAtQueryVariables
+      >(listItemsSortedByCreatedAt, {
+        modelType: ItemModelType.ITEM,
+        filter: { searchField: { contains: searchValue } },
+        sortDirection: ModelSortDirection.DESC,
+      }),
+  )
+
+  const onSearchValueChange = debounce((text) => {
+    setSearchValue(getTextWithoutAccents(text))
+    refetch()
+  }, 300)
+
+  return (
+    <Box>
+      <H2>{text.Inventory}</H2>
+      <FormControl id="search" marginBottom="4">
+        <FormLabel>{sharedText.Search}</FormLabel>
+        <InputGroup>
+          <Input
+            type="text"
+            placeholder={`${sharedText['Printer ink']} 150`}
+            defaultValue={searchValue}
+            onChange={(e) => onSearchValueChange(e.target.value)}
+          />
+          <InputRightElement children={isFetching ? <Spinner /> : null} />
+        </InputGroup>
+      </FormControl>
+      {status === 'success' && (
+        <Accordion allowMultiple>
+          {data.data.listItemsSortedByCreatedAt.items.map((item) => (
+            <Item key={item.id} {...item} />
+          ))}
+        </Accordion>
+      )}
+    </Box>
+  )
+}
 
 const Import = () => (
   <PageLayout activeNavItem="import">
