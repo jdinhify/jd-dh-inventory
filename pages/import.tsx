@@ -5,6 +5,7 @@ import {
   AccordionPanel,
   Box,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   Stack,
@@ -18,7 +19,75 @@ import { MdAdd, MdClose } from 'react-icons/md'
 import { Button } from 'src/components/button'
 import { PageLayout } from 'src/components/page-layout'
 import { sharedText } from 'src/shared/text'
+import { H2 } from 'src/components/heading'
+import { useForm } from 'react-hook-form'
+import { ItemModelType } from 'src/graphql/types'
+import { getTextWithoutAccents } from 'src/shared/get-text-without-accents'
 
+const NewItemForm = () => {
+  const { register, errors, handleSubmit, getValues } = useForm<{
+    name: string
+    quantity: number
+    price: number
+  }>()
+
+  const onSubmit = () => {
+    const values = getValues()
+
+    const item = {
+      type: ItemModelType.ITEM,
+      name: values.name,
+      price: values.price,
+      quantity: values.quantity,
+      searchField: `${getTextWithoutAccents(values.name).toLowerCase()} ${
+        values.price
+      }`,
+    }
+    console.log(item)
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack spacing="4">
+        <FormControl id="name" isInvalid={!!errors.name?.message}>
+          <FormLabel>{sharedText.Name}</FormLabel>
+          <Input
+            type="text"
+            name="name"
+            placeholder={sharedText['Printer ink']}
+            ref={register({ required: 'Required' })}
+          />
+          <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+        </FormControl>
+        <Stack direction="row">
+          <FormControl id="quantity" isInvalid={!!errors.quantity?.message}>
+            <FormLabel>{sharedText.Quantity}</FormLabel>
+            <Input
+              type="number"
+              name="quantity"
+              placeholder="10"
+              ref={register({ required: 'Required' })}
+            />
+            <FormErrorMessage>{errors.quantity?.message}</FormErrorMessage>
+          </FormControl>
+          <FormControl id="price" isInvalid={!!errors.price?.message}>
+            <FormLabel>{sharedText.Price} (K)</FormLabel>
+            <Input
+              type="number"
+              name="price"
+              placeholder="150"
+              ref={register({ required: 'Required' })}
+            />
+            <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
+          </FormControl>
+        </Stack>
+        <Box>
+          <Button type="submit">{sharedText.Import}</Button>
+        </Box>
+      </Stack>
+    </form>
+  )
+}
 const NewItem = () => (
   <Accordion allowToggle marginY="8">
     <AccordionItem borderWidth="1px" borderColor="gray.300" borderRadius="5px">
@@ -26,30 +95,12 @@ const NewItem = () => (
         <>
           <AccordionButton>
             <Box flex="1" textAlign="left">
-              {sharedText['New item']}
+              <H2>{sharedText['New item']}</H2>
             </Box>
             {isExpanded ? <MdClose /> : <MdAdd />}
           </AccordionButton>
           <AccordionPanel>
-            <Stack spacing="4">
-              <FormControl id="name">
-                <FormLabel>{sharedText.Name}</FormLabel>
-                <Input type="text" placeholder={sharedText['Printer ink']} />
-              </FormControl>
-              <Stack direction="row">
-                <FormControl id="quantity">
-                  <FormLabel>{sharedText.Quantity}</FormLabel>
-                  <Input type="number" placeholder="10" />
-                </FormControl>
-                <FormControl id="price">
-                  <FormLabel>{sharedText.Price} (K)</FormLabel>
-                  <Input type="number" placeholder="150" />
-                </FormControl>
-              </Stack>
-              <Box>
-                <Button>{sharedText.Import}</Button>
-              </Box>
-            </Stack>
+            <NewItemForm />
           </AccordionPanel>
         </>
       )}
