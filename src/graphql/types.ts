@@ -369,6 +369,24 @@ export type CreateTransactionMutation = {
   } | null,
 };
 
+export type PageExportExportItemMutationVariables = {
+  createTransactionInput: CreateTransactionInput,
+  createTransactionCondition?: ModelTransactionConditionInput | null,
+  updateItemInput: UpdateItemInput,
+  updateItemCondition?: ModelItemConditionInput | null,
+};
+
+export type PageExportExportItemMutation = {
+  createTransaction:  {
+    __typename: "Transaction",
+    id: string,
+  } | null,
+  updateItem:  {
+    __typename: "Item",
+    id: string,
+  } | null,
+};
+
 export type PageImportCreateTransactionMutationVariables = {
   input: CreateTransactionInput,
   condition?: ModelTransactionConditionInput | null,

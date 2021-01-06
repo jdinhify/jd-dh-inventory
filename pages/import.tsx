@@ -49,11 +49,11 @@ import {
 import { listItemsSortedByCreatedAt } from 'src/graphql/queries'
 import { debounce } from 'lodash'
 
-const importItemListQueryKey = 'list-items'
+const importItemListQueryKey = 'import-list-items'
 
 const text = {
   'Import more': 'Nhập thêm',
-  'Additional quantity': 'Số lượng thêm',
+  'Import quantity': 'Số lượng nhập',
   Inventory: 'Kho',
 }
 
@@ -171,7 +171,7 @@ const Item: FC<{
   searchField: string
 }> = ({ id, name, quantity, price, searchField }) => {
   const queryClient = useQueryClient()
-  const [additionalQuantity, setAdditionalQuantity] = useState<string>('')
+  const [importQuantity, setImportQuantity] = useState<string>('')
   const { status, reset, mutate } = useMutation(() => {
     return Promise.all([
       gqlOp<
@@ -182,7 +182,7 @@ const Item: FC<{
           itemId: id,
           modelType: TransactionModelType.TRANSACTION,
           price: price,
-          quantity: Number(additionalQuantity),
+          quantity: Number(importQuantity),
           searchField,
           type: TransactionType.IN,
         },
@@ -193,7 +193,7 @@ const Item: FC<{
       >(pageImportUpdateItem, {
         input: {
           id,
-          quantity: quantity + Number(additionalQuantity),
+          quantity: quantity + Number(importQuantity),
         },
       }),
     ])
@@ -202,7 +202,7 @@ const Item: FC<{
   useEffect(() => {
     if (status === 'success') {
       queryClient.invalidateQueries(importItemListQueryKey)
-      setAdditionalQuantity('')
+      setImportQuantity('')
       reset()
     }
   }, [queryClient, reset, status])
@@ -243,17 +243,17 @@ const Item: FC<{
         <Stack spacing="4">
           <Stack direction="row" alignItems="flex-end">
             <FormControl id={`${id}-quantity`}>
-              <FormLabel>{text['Additional quantity']}</FormLabel>
+              <FormLabel>{text['Import quantity']}</FormLabel>
               <Input
                 type="number"
                 placeholder="10"
-                onChange={(e) => setAdditionalQuantity(e.target.value)}
-                value={additionalQuantity}
+                onChange={(e) => setImportQuantity(e.target.value)}
+                value={importQuantity}
               />
             </FormControl>
             <Box>
               <Button
-                isDisabled={additionalQuantity.trim().length === 0}
+                isDisabled={importQuantity.trim().length === 0}
                 isLoading={status === 'loading'}
                 onClick={onSubmit}
               >
