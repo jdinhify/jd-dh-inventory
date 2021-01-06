@@ -1,20 +1,14 @@
-export const pageImportCreateTransaction = /* GraphQL */ `
-  mutation PageImportCreateTransaction(
-    $input: CreateTransactionInput!
-    $condition: ModelTransactionConditionInput
+export const pageImportImportItem = /* GraphQL */ `
+  mutation PageImportImportItem(
+    $createTransactionInput: CreateTransactionInput!
+    $createTransactionCondition: ModelTransactionConditionInput
+    $updateItemInput: UpdateItemInput!
+    $updateItemCondition: ModelItemConditionInput
   ) {
-    createTransaction(input: $input, condition: $condition) {
+    createTransaction(input: $createTransactionInput, condition: $createTransactionCondition) {
       id
     }
-  }
-`;
-
-export const pageImportUpdateItem = /* GraphQL */ `
-  mutation PageImportUpdateItem(
-    $input: UpdateItemInput!
-    $condition: ModelItemConditionInput
-  ) {
-    updateItem(input: $input, condition: $condition) {
+    updateItem(input: $updateItemInput, condition: $updateItemCondition) {
       id
     }
   }

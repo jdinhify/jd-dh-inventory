@@ -1,28 +1,32 @@
 import {
-  Accordion,
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
   Box,
   FormControl,
   FormErrorMessage,
   FormLabel,
+  IconButton,
   Input,
   InputGroup,
   InputRightElement,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Spinner,
   Stack,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react'
 import React, { FC, useEffect, useState } from 'react'
 import { PageSection } from 'src/components/page-section'
 import { SEO } from 'src/components/seo'
 import { withAuth } from 'src/components/with-auth'
-import { MdAdd, MdClose } from 'react-icons/md'
+import { MdAdd } from 'react-icons/md'
 import { Button } from 'src/components/button'
 import { PageLayout } from 'src/components/page-layout'
 import { sharedText } from 'src/shared/text'
-import { H2 } from 'src/components/heading'
+import { H2, H3 } from 'src/components/heading'
 import { useForm } from 'react-hook-form'
 import {
   CreateItemMutation,
@@ -31,10 +35,8 @@ import {
   ListItemsSortedByCreatedAtQuery,
   ListItemsSortedByCreatedAtQueryVariables,
   ModelSortDirection,
-  PageImportCreateTransactionMutation,
-  PageImportCreateTransactionMutationVariables,
-  PageImportUpdateItemMutation,
-  PageImportUpdateItemMutationVariables,
+  PageImportImportItemMutation,
+  PageImportImportItemMutationVariables,
   TransactionModelType,
   TransactionType,
 } from 'src/graphql/types'
@@ -42,22 +44,20 @@ import { getTextWithoutAccents } from 'src/shared/get-text-without-accents'
 import { gqlOp } from 'src/shared/gql-op'
 import { createItem } from 'src/graphql/mutations'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import {
-  pageImportCreateTransaction,
-  pageImportUpdateItem,
-} from 'src/graphql/page-import'
+import { pageImportImportItem } from 'src/graphql/page-import'
 import { listItemsSortedByCreatedAt } from 'src/graphql/queries'
 import { debounce } from 'lodash'
 
-const importItemListQueryKey = 'import-list-items'
+const importItemListQueryKey = 'import-item-list'
 
 const text = {
-  'Import more': 'Nhập thêm',
   'Import quantity': 'Số lượng nhập',
+  'Import item': 'Nhập hàng',
   Inventory: 'Kho',
 }
 
-const NewItemForm = () => {
+const NewItem = () => {
+  const { isOpen, onClose, onOpen } = useDisclosure()
   const queryClient = useQueryClient()
   const {
     register,
@@ -71,10 +71,24 @@ const NewItemForm = () => {
     price: number
   }>()
   const { mutate, status: mutationStatus, reset: mutationReset } = useMutation(
-    (input: CreateItemMutationVariables['input']) =>
-      gqlOp<CreateItemMutation, CreateItemMutationVariables>(createItem, {
-        input,
-      }),
+    () => {
+      const values = getValues()
+      const input = {
+        modelType: ItemModelType.ITEM,
+        name: values.name,
+        price: values.price,
+        quantity: values.quantity,
+        searchField: `${getTextWithoutAccents(values.name).toLowerCase()} ${
+          values.price
+        }`,
+      }
+      return gqlOp<CreateItemMutation, CreateItemMutationVariables>(
+        createItem,
+        {
+          input,
+        },
+      )
+    },
   )
 
   useEffect(() => {
@@ -82,188 +96,221 @@ const NewItemForm = () => {
       queryClient.invalidateQueries(importItemListQueryKey)
       formReset()
       mutationReset()
+      onClose()
     }
-  }, [mutationStatus, formReset, mutationReset, queryClient])
+  }, [mutationStatus, formReset, mutationReset, queryClient, onClose])
 
-  const onSubmit = async () => {
-    const values = getValues()
-    const item = {
-      modelType: ItemModelType.ITEM,
-      name: values.name,
-      price: values.price,
-      quantity: values.quantity,
-      searchField: `${getTextWithoutAccents(values.name).toLowerCase()} ${
-        values.price
-      }`,
+  const onSubmit = () => mutate()
+  const closeModal = () => {
+    if (mutationStatus !== 'loading') {
+      formReset()
+      mutationReset()
+      onClose()
     }
-    mutationStatus === 'idle' && mutate(item)
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing="4">
-        <FormControl id="name" isInvalid={!!errors.name?.message}>
-          <FormLabel>{sharedText.Name}</FormLabel>
-          <Input
-            type="text"
-            name="name"
-            placeholder={sharedText['Printer ink']}
-            ref={register({ required: 'Required' })}
-          />
-          <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
-        </FormControl>
-        <Stack direction="row">
-          <FormControl id="quantity" isInvalid={!!errors.quantity?.message}>
-            <FormLabel>{sharedText.Quantity}</FormLabel>
-            <Input
-              type="number"
-              name="quantity"
-              placeholder="10"
-              ref={register({ required: 'Required' })}
-            />
-            <FormErrorMessage>{errors.quantity?.message}</FormErrorMessage>
-          </FormControl>
-          <FormControl id="price" isInvalid={!!errors.price?.message}>
-            <FormLabel>{sharedText.Price} (K)</FormLabel>
-            <Input
-              type="number"
-              name="price"
-              placeholder="150"
-              ref={register({ required: 'Required' })}
-            />
-            <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
-          </FormControl>
-        </Stack>
-        <Box>
-          <Button type="submit" isLoading={mutationStatus === 'loading'}>
-            {sharedText.Import}
-          </Button>
-        </Box>
-      </Stack>
-    </form>
+    <>
+      <IconButton
+        aria-label="New item"
+        icon={<MdAdd />}
+        onClick={onOpen}
+        variant="outline"
+        colorScheme="green"
+      />
+      <Modal isOpen={isOpen} onClose={closeModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{sharedText['New item']}</ModalHeader>
+          <ModalBody>
+            <Stack spacing="4">
+              <FormControl id="name" isInvalid={!!errors.name?.message}>
+                <FormLabel>{sharedText.Name}</FormLabel>
+                <Input
+                  type="text"
+                  name="name"
+                  placeholder={sharedText['Printer ink']}
+                  ref={register({ required: 'Required' })}
+                />
+                <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+              </FormControl>
+              <Stack direction="row">
+                <FormControl
+                  id="quantity"
+                  isInvalid={!!errors.quantity?.message}
+                >
+                  <FormLabel>{sharedText.Quantity}</FormLabel>
+                  <Input
+                    type="number"
+                    name="quantity"
+                    placeholder="10"
+                    ref={register({ required: 'Required' })}
+                  />
+                  <FormErrorMessage>
+                    {errors.quantity?.message}
+                  </FormErrorMessage>
+                </FormControl>
+                <FormControl id="price" isInvalid={!!errors.price?.message}>
+                  <FormLabel>{sharedText.Price} (K)</FormLabel>
+                  <Input
+                    type="number"
+                    name="price"
+                    placeholder="150"
+                    ref={register({ required: 'Required' })}
+                  />
+                  <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
+                </FormControl>
+              </Stack>
+            </Stack>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              variant="ghost"
+              marginRight="4"
+              onClick={closeModal}
+              secondary
+            >
+              {sharedText.Close}
+            </Button>
+            <Button
+              isLoading={mutationStatus === 'loading'}
+              onClick={handleSubmit(onSubmit)}
+            >
+              {sharedText.Import}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   )
 }
-const NewItem = () => (
-  <Accordion allowToggle marginY="8">
-    <AccordionItem borderWidth="1px" borderColor="gray.300" borderRadius="5px">
-      {({ isExpanded }) => (
-        <>
-          <AccordionButton>
-            <Box flex="1" textAlign="left">
-              <H2>{sharedText['New item']}</H2>
-            </Box>
-            {isExpanded ? <MdClose /> : <MdAdd />}
-          </AccordionButton>
-          <AccordionPanel>
-            <NewItemForm />
-          </AccordionPanel>
-        </>
-      )}
-    </AccordionItem>
-  </Accordion>
-)
 
-const Item: FC<{
+const ImportItemModal: FC<{
+  isOpen: boolean
   id: string
   name: string
   quantity: number
   price: number
   searchField: string
-}> = ({ id, name, quantity, price, searchField }) => {
-  const queryClient = useQueryClient()
-  const [importQuantity, setImportQuantity] = useState<string>('')
+  onClose: () => void
+}> = ({ id, name, quantity, price, searchField, isOpen, onClose }) => {
+  const {
+    register,
+    getValues,
+    errors,
+    handleSubmit,
+    reset: formReset,
+  } = useForm<{
+    'import-price': string
+    'import-quantity': string
+  }>()
   const { status, reset, mutate } = useMutation(() => {
-    return Promise.all([
-      gqlOp<
-        PageImportCreateTransactionMutation,
-        PageImportCreateTransactionMutationVariables
-      >(pageImportCreateTransaction, {
-        input: {
-          itemId: id,
-          modelType: TransactionModelType.TRANSACTION,
-          price: price,
-          quantity: Number(importQuantity),
-          searchField,
-          type: TransactionType.IN,
-        },
-      }),
-      gqlOp<
-        PageImportUpdateItemMutation,
-        PageImportUpdateItemMutationVariables
-      >(pageImportUpdateItem, {
-        input: {
-          id,
-          quantity: quantity + Number(importQuantity),
-        },
-      }),
-    ])
+    const formValues = getValues()
+    return gqlOp<
+      PageImportImportItemMutation,
+      PageImportImportItemMutationVariables
+    >(pageImportImportItem, {
+      createTransactionInput: {
+        itemId: id,
+        modelType: TransactionModelType.TRANSACTION,
+        price: price,
+        quantity: Number(formValues['import-quantity']),
+        searchField,
+        type: TransactionType.IN,
+      },
+      updateItemInput: {
+        id,
+        quantity: quantity + Number(formValues['import-quantity']),
+      },
+    })
   })
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (status === 'success') {
       queryClient.invalidateQueries(importItemListQueryKey)
-      setImportQuantity('')
       reset()
+      onClose()
     }
-  }, [queryClient, reset, status])
+  }, [queryClient, reset, status, onClose])
 
-  const onSubmit = () => {
-    mutate()
+  const onSubmit = () => mutate()
+
+  const closeModal = () => {
+    if (status !== 'loading') {
+      formReset()
+      onClose()
+    }
   }
 
   return (
-    <AccordionItem
-      marginBottom="4"
+    <Modal isOpen={isOpen} onClose={closeModal}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>{text['Import item']}</ModalHeader>
+        <ModalBody>
+          <H3 marginBottom="6">{`${name} - ${price}K (${quantity})`}</H3>
+          <FormControl
+            id="import-quantity"
+            marginBottom="4"
+            isInvalid={!!errors['import-quantity']?.message}
+          >
+            <FormLabel>{text['Import quantity']}</FormLabel>
+            <Input
+              type="number"
+              placeholder="10"
+              name="import-quantity"
+              ref={register({
+                required: 'Required',
+                min: { value: 0, message: 'Minimum value' },
+              })}
+            />
+          </FormControl>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button variant="ghost" onClick={closeModal} marginRight="4">
+            Close
+          </Button>
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            isLoading={status === 'loading'}
+          >
+            {sharedText['Import']}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  )
+}
+
+const Item: FC<{
+  name: string
+  quantity: number
+  price: number
+  onClick: () => void
+}> = ({ name, quantity, price, onClick }) => {
+  return (
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      padding="4"
+      width="100%"
       borderWidth="1px"
       borderRadius="5px"
-      borderColor="gray.400"
+      borderColor="gray.300"
+      _hover={{ borderColor: 'gray.500', cursor: 'pointer' }}
+      onClick={onClick}
     >
-      <AccordionButton
-        padding={0}
-        border="0"
-        borderTopRadius="5px"
-        _expanded={{ backgroundColor: 'gray.100' }}
-      >
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          padding="4"
-          width="100%"
-        >
-          <Box display="flex">
-            <Text>{name}</Text>
-            <Text paddingRight="2" paddingLeft="2">
-              - {`${price}K`}
-            </Text>{' '}
-          </Box>
-          <Text>({quantity})</Text>
-        </Box>
-      </AccordionButton>
-      <AccordionPanel>
-        <Stack spacing="4">
-          <Stack direction="row" alignItems="flex-end">
-            <FormControl id={`${id}-quantity`}>
-              <FormLabel>{text['Import quantity']}</FormLabel>
-              <Input
-                type="number"
-                placeholder="10"
-                onChange={(e) => setImportQuantity(e.target.value)}
-                value={importQuantity}
-              />
-            </FormControl>
-            <Box>
-              <Button
-                isDisabled={importQuantity.trim().length === 0}
-                isLoading={status === 'loading'}
-                onClick={onSubmit}
-              >
-                {text['Import more']}
-              </Button>
-            </Box>
-          </Stack>
-        </Stack>
-      </AccordionPanel>
-    </AccordionItem>
+      <Box display="flex">
+        <Text>{name}</Text>
+        <Text paddingRight="2" paddingLeft="2">
+          - {`${price}K`}
+        </Text>{' '}
+      </Box>
+      <Text>({quantity})</Text>
+    </Box>
   )
 }
 
@@ -281,15 +328,22 @@ const ItemList = () => {
         sortDirection: ModelSortDirection.DESC,
       }),
   )
+  const [selectedItemId, setSelectedItemId] = useState<string | undefined>()
+  const selectedItem = data?.data?.listItemsSortedByCreatedAt?.items?.find(
+    ({ id }) => id === selectedItemId,
+  )
 
   const onSearchValueChange = debounce((text) => {
-    setSearchValue(getTextWithoutAccents(text))
+    setSearchValue(getTextWithoutAccents(text).toLowerCase())
     refetch()
   }, 300)
 
   return (
-    <Box>
-      <H2>{text.Inventory}</H2>
+    <Box marginTop="8">
+      <Stack direction="row" justifyContent="space-between">
+        <H2>{text.Inventory}</H2>
+        <NewItem />
+      </Stack>
       <FormControl id="search" marginBottom="4">
         <FormLabel>{sharedText.Search}</FormLabel>
         <InputGroup>
@@ -303,12 +357,21 @@ const ItemList = () => {
         </InputGroup>
       </FormControl>
       {status === 'success' && (
-        <Accordion allowMultiple>
+        <Stack>
           {data.data.listItemsSortedByCreatedAt.items.map((item) => (
-            <Item key={item.id} {...item} />
+            <Item
+              key={item.id}
+              {...item}
+              onClick={() => setSelectedItemId(item.id)}
+            />
           ))}
-        </Accordion>
+        </Stack>
       )}
+      <ImportItemModal
+        {...selectedItem}
+        isOpen={!!selectedItem}
+        onClose={() => setSelectedItemId(undefined)}
+      />
     </Box>
   )
 }
@@ -318,7 +381,6 @@ const Import = () => (
     <SEO title="Import" />
     <PageSection>
       <Stack>
-        <NewItem />
         <ItemList />
       </Stack>
     </PageSection>

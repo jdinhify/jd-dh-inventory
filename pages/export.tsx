@@ -176,8 +176,13 @@ const ExportItemModal: FC<{
         </ModalBody>
 
         <ModalFooter>
-          <Button variant="ghost" onClick={closeModal} marginRight="4">
-            Close
+          <Button
+            variant="ghost"
+            onClick={closeModal}
+            marginRight="4"
+            secondary
+          >
+            {sharedText.Close}
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
@@ -211,7 +216,7 @@ const ItemList = () => {
   )
 
   const onSearchValueChange = debounce((text) => {
-    setSearchValue(getTextWithoutAccents(text))
+    setSearchValue(getTextWithoutAccents(text).toLowerCase())
     refetch()
   }, 300)
 

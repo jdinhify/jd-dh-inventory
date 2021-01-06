@@ -8,4 +8,5 @@ export const sharedText = {
   Import: 'Nhập',
   Export: 'Xuất',
   History: 'Lịch sử',
+  Close: 'Đóng',
 }

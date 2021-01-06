@@ -387,24 +387,18 @@ export type PageExportExportItemMutation = {
   } | null,
 };
 
-export type PageImportCreateTransactionMutationVariables = {
-  input: CreateTransactionInput,
-  condition?: ModelTransactionConditionInput | null,
+export type PageImportImportItemMutationVariables = {
+  createTransactionInput: CreateTransactionInput,
+  createTransactionCondition?: ModelTransactionConditionInput | null,
+  updateItemInput: UpdateItemInput,
+  updateItemCondition?: ModelItemConditionInput | null,
 };
 
-export type PageImportCreateTransactionMutation = {
+export type PageImportImportItemMutation = {
   createTransaction:  {
     __typename: "Transaction",
     id: string,
   } | null,
-};
-
-export type PageImportUpdateItemMutationVariables = {
-  input: UpdateItemInput,
-  condition?: ModelItemConditionInput | null,
-};
-
-export type PageImportUpdateItemMutation = {
   updateItem:  {
     __typename: "Item",
     id: string,
