@@ -45,7 +45,6 @@ const exportItemListQueryKey = 'export-list-items'
 
 const text = {
   'Export quantity': 'Số lượng xuất',
-  'Export price': 'Giá xuất',
   'Export item': 'Xuất hàng',
   Inventory: 'Kho',
 }
@@ -109,7 +108,7 @@ const ExportItemModal: FC<{
         modelType: TransactionModelType.TRANSACTION,
         price: Number(formValues['export-price']),
         quantity: Number(formValues['export-quantity']),
-        searchField,
+        searchField: `${searchField} ${formValues['export-price']}`,
         type: TransactionType.OUT,
       },
       updateItemInput: {
@@ -165,7 +164,7 @@ const ExportItemModal: FC<{
             id="export-price"
             isInvalid={!!errors['export-price']?.message}
           >
-            <FormLabel>{text['Export price']} (K)</FormLabel>
+            <FormLabel>{sharedText['Export price']} (K)</FormLabel>
             <Input
               type="number"
               placeholder="100"

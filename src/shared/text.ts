@@ -7,6 +7,10 @@ export const sharedText = {
   Search: 'Tìm',
   Import: 'Nhập',
   Export: 'Xuất',
-  History: 'Lịch sử',
   Close: 'Đóng',
+  Activity: 'Hoạt động',
+  'Import price': 'Giá nhập',
+  'Export price': 'Giá xuất',
+  Time: 'Thời gian',
+  Type: 'Loại',
 }

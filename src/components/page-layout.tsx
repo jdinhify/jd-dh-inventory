@@ -23,7 +23,7 @@ const NavItem: FC<{
   </Link>
 )
 
-export type navItemId = 'import' | 'export' | 'history'
+export type navItemId = 'import' | 'export' | 'home'
 
 const navItems = [
   {
@@ -39,10 +39,10 @@ const navItems = [
     href: '/export',
   },
   {
-    key: 'history',
-    label: sharedText['History'],
+    key: 'home',
+    label: sharedText['Activity'],
     icon: BiHistory,
-    href: '/history',
+    href: '/',
   },
 ]
 

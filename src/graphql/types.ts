@@ -176,33 +176,6 @@ export type CreateTransactionInput = {
   searchField: string,
 };
 
-export type ModelItemFilterInput = {
-  id?: ModelIDInput | null,
-  name?: ModelStringInput | null,
-  price?: ModelIntInput | null,
-  quantity?: ModelIntInput | null,
-  modelType?: ModelItemModelTypeInput | null,
-  createdAt?: ModelStringInput | null,
-  searchField?: ModelStringInput | null,
-  and?: Array< ModelItemFilterInput | null > | null,
-  or?: Array< ModelItemFilterInput | null > | null,
-  not?: ModelItemFilterInput | null,
-};
-
-export type ModelTransactionFilterInput = {
-  id?: ModelIDInput | null,
-  itemId?: ModelIDInput | null,
-  quantity?: ModelIntInput | null,
-  price?: ModelIntInput | null,
-  type?: ModelTransactionTypeInput | null,
-  modelType?: ModelTransactionModelTypeInput | null,
-  createdAt?: ModelStringInput | null,
-  searchField?: ModelStringInput | null,
-  and?: Array< ModelTransactionFilterInput | null > | null,
-  or?: Array< ModelTransactionFilterInput | null > | null,
-  not?: ModelTransactionFilterInput | null,
-};
-
 export type ModelStringKeyConditionInput = {
   eq?: string | null,
   le?: string | null,
@@ -218,6 +191,33 @@ export enum ModelSortDirection {
   DESC = "DESC",
 }
 
+
+export type ModelTransactionFilterInput = {
+  id?: ModelIDInput | null,
+  itemId?: ModelIDInput | null,
+  quantity?: ModelIntInput | null,
+  price?: ModelIntInput | null,
+  type?: ModelTransactionTypeInput | null,
+  modelType?: ModelTransactionModelTypeInput | null,
+  createdAt?: ModelStringInput | null,
+  searchField?: ModelStringInput | null,
+  and?: Array< ModelTransactionFilterInput | null > | null,
+  or?: Array< ModelTransactionFilterInput | null > | null,
+  not?: ModelTransactionFilterInput | null,
+};
+
+export type ModelItemFilterInput = {
+  id?: ModelIDInput | null,
+  name?: ModelStringInput | null,
+  price?: ModelIntInput | null,
+  quantity?: ModelIntInput | null,
+  modelType?: ModelItemModelTypeInput | null,
+  createdAt?: ModelStringInput | null,
+  searchField?: ModelStringInput | null,
+  and?: Array< ModelItemFilterInput | null > | null,
+  or?: Array< ModelItemFilterInput | null > | null,
+  not?: ModelItemFilterInput | null,
+};
 
 export type CreateItemMutationVariables = {
   input: CreateItemInput,
@@ -384,6 +384,35 @@ export type PageExportExportItemMutation = {
   updateItem:  {
     __typename: "Item",
     id: string,
+  } | null,
+};
+
+export type PageHomeListTransactionsQueryVariables = {
+  modelType?: TransactionModelType | null,
+  createdAt?: ModelStringKeyConditionInput | null,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelTransactionFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type PageHomeListTransactionsQuery = {
+  listTransactionsSortedByCreatedAt:  {
+    __typename: "ModelTransactionConnection",
+    items:  Array< {
+      __typename: "Transaction",
+      id: string,
+      quantity: number,
+      price: number,
+      type: TransactionType,
+      createdAt: string,
+      item:  {
+        __typename: "Item",
+        id: string,
+        name: string,
+        price: number,
+      } | null,
+    } | null > | null,
   } | null,
 };
 
