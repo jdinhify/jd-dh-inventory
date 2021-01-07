@@ -1,0 +1,47 @@
+name: build & release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npm i -g @aws-amplify/cli
+      - run: npm ci
+
+      - name: typecheck & lint
+        run: |
+          npm run typecheck
+          npm run eslint:ci
+
+      - name: build dev
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-southeast-1
+          AMPLIFY_GOOGLE_CLIENT_ID: ${{ secrets.DEV_AMPLIFY_GOOGLE_CLIENT_ID }}
+          AMPLIFY_GOOGLE_CLIENT_SECRET: ${{ secrets.DEV_AMPLIFY_GOOGLE_CLIENT_SECRET }}
+          AWS_APP_ID: ${{ secrets.AWS_APP_ID}}
+          AWS_APP_ENV_NAME: dev
+        run: |
+          ./ops/bin/amplify-pull.sh
+          npm run build
+
+      - name: release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx semantic-release
