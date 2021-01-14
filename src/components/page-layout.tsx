@@ -77,9 +77,7 @@ export const PageLayout: FC<{
   activeNavItem: navItemId
 }> = ({ children, activeNavItem }) => (
   <Stack height="100vh">
-    <Box flexGrow={1} overflow="auto">
-      {children}
-    </Box>
+    <Box flexGrow={1}>{children}</Box>
     <Nav activeNavItem={activeNavItem} />
   </Stack>
 )

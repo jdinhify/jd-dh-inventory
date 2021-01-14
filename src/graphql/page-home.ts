@@ -21,6 +21,7 @@ export const pageHomeListTransactions = /* GraphQL */ `
         price
         type
         createdAt
+        notes
         item {
           id
           name

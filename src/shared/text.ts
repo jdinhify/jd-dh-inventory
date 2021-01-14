@@ -13,4 +13,5 @@ export const sharedText = {
   'Export price': 'Giá xuất',
   Time: 'Thời gian',
   Type: 'Loại',
+  Notes: 'Ghi chú',
 }

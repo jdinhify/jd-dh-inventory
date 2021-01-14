@@ -73,7 +73,7 @@ const Item: FC<
       <Box display="flex">
         <Text>{name}</Text>
         <Text paddingRight="2" paddingLeft="2">
-          - {`${price}K - ${notes}`}
+          - {`${price} - ${notes}`}
         </Text>{' '}
       </Box>
       <Text>({quantity})</Text>
@@ -146,7 +146,7 @@ const ExportItemModal: FC<
       <ModalContent>
         <ModalHeader>{text['Export item']}</ModalHeader>
         <ModalBody>
-          <H3 marginBottom="6">{`${name} - ${price}K - ${notes} - (${quantity})`}</H3>
+          <H3 marginBottom="6">{`${name} - ${price} - ${notes} - (${quantity})`}</H3>
           <Stack spacing="4">
             <Stack direction="row">
               <FormControl
@@ -169,7 +169,7 @@ const ExportItemModal: FC<
                 id="export-price"
                 isInvalid={!!errors['export-price']?.message}
               >
-                <FormLabel>{sharedText['Export price']} (K)</FormLabel>
+                <FormLabel>{sharedText['Export price']}</FormLabel>
                 <Input
                   type="number"
                   placeholder="100"

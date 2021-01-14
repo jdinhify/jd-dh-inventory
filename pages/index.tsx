@@ -70,35 +70,39 @@ const ItemList = () => {
           <InputRightElement children={isFetching ? <Spinner /> : null} />
         </InputGroup>
       </FormControl>
-      <Table variant="striped">
-        <Thead>
-          <Tr>
-            <Th>{sharedText.Name}</Th>
-            <Th>{sharedText.Type}</Th>
-            <Th>{sharedText.Time}</Th>
-            <Th>{sharedText.Quantity}</Th>
-            <Th>{sharedText['Import price']}</Th>
-            <Th>{sharedText['Export price']}</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {status === 'success' &&
-            data.data.listTransactionsSortedByCreatedAt.items.map((item) => (
-              <Tr key={item.id}>
-                <Td>{item.item.name}</Td>
-                <Td>
-                  {item.type === TransactionType.IN
-                    ? sharedText.Import
-                    : sharedText.Export}
-                </Td>
-                <Td>{new Date(item.createdAt).toLocaleString()}</Td>
-                <Td>{item.quantity}</Td>
-                <Td>{item.type === TransactionType.IN && item.price}</Td>
-                <Td>{item.type === TransactionType.OUT && item.price}</Td>
-              </Tr>
-            ))}
-        </Tbody>
-      </Table>
+      <Box overflow="auto">
+        <Table variant="striped">
+          <Thead>
+            <Tr>
+              <Th>{sharedText.Name}</Th>
+              <Th>{sharedText.Type}</Th>
+              <Th>{sharedText.Notes}</Th>
+              <Th>{sharedText.Time}</Th>
+              <Th>{sharedText.Quantity}</Th>
+              <Th>{sharedText['Import price']}</Th>
+              <Th>{sharedText['Export price']}</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {status === 'success' &&
+              data.data.listTransactionsSortedByCreatedAt.items.map((item) => (
+                <Tr key={item.id}>
+                  <Td>{item.item.name}</Td>
+                  <Td>
+                    {item.type === TransactionType.IN
+                      ? sharedText.Import
+                      : sharedText.Export}
+                  </Td>
+                  <Td>{item.notes}</Td>
+                  <Td>{new Date(item.createdAt).toLocaleDateString()}</Td>
+                  <Td>{item.quantity}</Td>
+                  <Td>{item.type === TransactionType.IN && item.price}</Td>
+                  <Td>{item.type === TransactionType.OUT && item.price}</Td>
+                </Tr>
+              ))}
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   )
 }

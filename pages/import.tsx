@@ -157,7 +157,7 @@ const NewItem = () => {
                   />
                 </FormControl>
                 <FormControl id="price" isInvalid={!!errors.price?.message}>
-                  <FormLabel>{sharedText.Price} (K)</FormLabel>
+                  <FormLabel>{sharedText.Price}</FormLabel>
                   <Input
                     type="number"
                     name="price"
@@ -272,7 +272,7 @@ const ImportItemModal: FC<
       <ModalContent>
         <ModalHeader>{text['Import item']}</ModalHeader>
         <ModalBody>
-          <H3 marginBottom="6">{`${name} - ${price}K - ${notes} - (${quantity})`}</H3>
+          <H3 marginBottom="6">{`${name} - ${price} - ${notes} - (${quantity})`}</H3>
           <FormControl
             id="import-quantity"
             marginBottom="4"
@@ -336,7 +336,7 @@ const Item: FC<
       <Box display="flex">
         <Text>{name}</Text>
         <Text paddingRight="2" paddingLeft="2">
-          - {`${price}K - ${notes}`}
+          - {`${price} - ${notes}`}
         </Text>{' '}
       </Box>
       <Text>({quantity})</Text>

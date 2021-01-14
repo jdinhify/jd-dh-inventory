@@ -423,6 +423,7 @@ export type PageHomeListTransactionsQuery = {
       price: number,
       type: TransactionType,
       createdAt: string,
+      notes: string,
       item:  {
         __typename: "Item",
         id: string,
