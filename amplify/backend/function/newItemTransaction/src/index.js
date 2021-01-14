@@ -40,7 +40,7 @@ const createTransaction = async (record) =>
         searchField,
         notes,
         createdAt,
-        type: 'IN',
+        type: 'IMPORT',
         modelType: 'TRANSACTION',
       },
     }

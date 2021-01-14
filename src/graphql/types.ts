@@ -116,8 +116,9 @@ export type UpdateTransactionInput = {
 };
 
 export enum TransactionType {
-  IN = "IN",
-  OUT = "OUT",
+  IMPORT = "IMPORT",
+  EXPORT = "EXPORT",
+  EXPORT_REVERTED = "EXPORT_REVERTED",
 }
 
 
@@ -429,8 +430,27 @@ export type PageHomeListTransactionsQuery = {
         id: string,
         name: string,
         price: number,
+        quantity: number,
       } | null,
     } | null > | null,
+  } | null,
+};
+
+export type RevertTransactionMutationVariables = {
+  updateTransactionInput: UpdateTransactionInput,
+  updateTransactionCondition?: ModelTransactionConditionInput | null,
+  updateItemInput: UpdateItemInput,
+  updateItemCondition?: ModelItemConditionInput | null,
+};
+
+export type RevertTransactionMutation = {
+  updateTransaction:  {
+    __typename: "Transaction",
+    id: string,
+  } | null,
+  updateItem:  {
+    __typename: "Item",
+    id: string,
   } | null,
 };
 

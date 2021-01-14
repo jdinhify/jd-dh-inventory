@@ -27,8 +27,9 @@ enum TransactionModelType {
   TRANSACTION
 }
 enum TransactionType {
-  IN
-  OUT
+  IMPORT
+  EXPORT
+  EXPORT_REVERTED
 }
 type Transaction
   @model

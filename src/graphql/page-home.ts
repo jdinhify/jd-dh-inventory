@@ -26,8 +26,25 @@ export const pageHomeListTransactions = /* GraphQL */ `
           id
           name
           price
+          quantity
         }
       }
+    }
+  }
+`;
+
+export const revertTransaction = /* GraphQL */ `
+  mutation RevertTransaction(
+    $updateTransactionInput: UpdateTransactionInput!
+    $updateTransactionCondition: ModelTransactionConditionInput
+    $updateItemInput: UpdateItemInput!
+    $updateItemCondition: ModelItemConditionInput
+  ) {
+    updateTransaction(input: $updateTransactionInput, condition: $updateTransactionCondition) {
+      id
+    }
+    updateItem(input: $updateItemInput, condition: $updateItemCondition) {
+      id
     }
   }
 `;

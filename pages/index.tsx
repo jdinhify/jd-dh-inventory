@@ -2,9 +2,16 @@ import {
   Box,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
   InputGroup,
   InputRightElement,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Spinner,
   Table,
   Tbody,
@@ -13,7 +20,7 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { PageSection } from 'src/components/page-section'
 import { SEO } from 'src/components/seo'
 import { withAuth } from 'src/components/with-auth'
@@ -24,16 +31,98 @@ import {
   ModelSortDirection,
   PageHomeListTransactionsQuery,
   PageHomeListTransactionsQueryVariables,
+  RevertTransactionMutation,
+  RevertTransactionMutationVariables,
   TransactionModelType,
   TransactionType,
 } from 'src/graphql/types'
-import { pageHomeListTransactions } from 'src/graphql/page-home'
-import { useQuery } from 'react-query'
+import {
+  pageHomeListTransactions,
+  revertTransaction,
+} from 'src/graphql/page-home'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { debounce } from 'lodash'
 import { getTextWithoutAccents } from 'src/shared/get-text-without-accents'
-import { H2 } from 'src/components/heading'
+import { H2, H3 } from 'src/components/heading'
+import { MdClose } from 'react-icons/md'
+import { Button } from 'src/components/button'
 
 const transactionListQueryKey = 'home-transaction-list'
+
+const text = {
+  revertTransactionModalHeader: 'Huỷ hoạt động',
+  revertTransactionModalSubtitle: 'Xác nhận huỷ hoạt động?',
+  Confirm: 'Xác nhận',
+}
+
+const RevertTransactionModal: FC<
+  {
+    isOpen: boolean
+    onClose: () => void
+  } & PageHomeListTransactionsQuery['listTransactionsSortedByCreatedAt']['items'][0]
+> = ({ isOpen, onClose, id, item, quantity, price, notes, createdAt }) => {
+  const { mutate, status, reset } = useMutation(() =>
+    gqlOp<RevertTransactionMutation, RevertTransactionMutationVariables>(
+      revertTransaction,
+      {
+        updateTransactionInput: {
+          id: id,
+          type: TransactionType.EXPORT_REVERTED,
+        },
+        updateItemInput: {
+          id: item.id,
+          quantity: item.quantity + quantity,
+        },
+      },
+    ),
+  )
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (status === 'success') {
+      queryClient.invalidateQueries(transactionListQueryKey)
+      reset()
+      onClose()
+    }
+  }, [queryClient, reset, status, onClose])
+
+  const closeModal = () => {
+    if (status !== 'loading') {
+      reset()
+      onClose()
+    }
+  }
+
+  return (
+    <Modal isOpen={isOpen} onClose={closeModal}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>{text.revertTransactionModalHeader}</ModalHeader>
+        <ModalBody>
+          <H2 marginBottom="4">{text.revertTransactionModalSubtitle}</H2>
+          <H3>{`${sharedText.Export}: ${
+            item?.name
+          } - ${price} - ${notes} - ${new Date(
+            createdAt,
+          ).toLocaleDateString()}`}</H3>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            variant="ghost"
+            marginRight="4"
+            onClick={closeModal}
+            secondary
+          >
+            {sharedText.Close}
+          </Button>
+          <Button isLoading={status === 'loading'} onClick={() => mutate()}>
+            {text.Confirm}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  )
+}
 
 const ItemList = () => {
   const [searchValue, setSearchValue] = useState('')
@@ -45,10 +134,20 @@ const ItemList = () => {
         PageHomeListTransactionsQueryVariables
       >(pageHomeListTransactions, {
         modelType: TransactionModelType.TRANSACTION,
-        filter: { searchField: { contains: searchValue } },
+        filter: {
+          type: { ne: TransactionType.EXPORT_REVERTED },
+          searchField: { contains: searchValue },
+        },
         sortDirection: ModelSortDirection.DESC,
       }),
   )
+  const [selectedTransactionId, setSelectedTransactionId] = useState<
+    string | undefined
+  >()
+  const selectedTransaction = data?.data.listTransactionsSortedByCreatedAt.items.find(
+    ({ id }) => id === selectedTransactionId,
+  )
+  console.log({ selectedTransaction })
 
   const onSearchValueChange = debounce((text) => {
     setSearchValue(getTextWithoutAccents(text).toLowerCase())
@@ -81,6 +180,7 @@ const ItemList = () => {
               <Th>{sharedText.Quantity}</Th>
               <Th>{sharedText['Import price']}</Th>
               <Th>{sharedText['Export price']}</Th>
+              <Th></Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -89,20 +189,36 @@ const ItemList = () => {
                 <Tr key={item.id}>
                   <Td>{item.item.name}</Td>
                   <Td>
-                    {item.type === TransactionType.IN
+                    {item.type === TransactionType.IMPORT
                       ? sharedText.Import
                       : sharedText.Export}
                   </Td>
                   <Td>{item.notes}</Td>
                   <Td>{new Date(item.createdAt).toLocaleDateString()}</Td>
                   <Td>{item.quantity}</Td>
-                  <Td>{item.type === TransactionType.IN && item.price}</Td>
-                  <Td>{item.type === TransactionType.OUT && item.price}</Td>
+                  <Td>{item.type === TransactionType.IMPORT && item.price}</Td>
+                  <Td>{item.type === TransactionType.EXPORT && item.price}</Td>
+                  <Td>
+                    {item.type === TransactionType.EXPORT && (
+                      <IconButton
+                        icon={<MdClose />}
+                        aria-label="Revert transaction"
+                        variant="outline"
+                        colorScheme="red"
+                        onClick={() => setSelectedTransactionId(item.id)}
+                      />
+                    )}
+                  </Td>
                 </Tr>
               ))}
           </Tbody>
         </Table>
       </Box>
+      <RevertTransactionModal
+        {...selectedTransaction}
+        isOpen={!!selectedTransaction}
+        onClose={() => setSelectedTransactionId(undefined)}
+      />
     </Box>
   )
 }

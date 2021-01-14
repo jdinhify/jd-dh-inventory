@@ -111,7 +111,7 @@ const ExportItemModal: FC<
         price: Number(formValues['export-price']),
         quantity: Number(formValues['export-quantity']),
         searchField: `${searchField} ${formValues['export-price']}`,
-        type: TransactionType.OUT,
+        type: TransactionType.EXPORT,
         notes: formValues.notes,
         createdAt: new Date(formValues.date).toISOString(),
       },

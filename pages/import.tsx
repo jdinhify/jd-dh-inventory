@@ -238,7 +238,7 @@ const ImportItemModal: FC<
         quantity: Number(formValues['import-quantity']),
         searchField,
         notes,
-        type: TransactionType.IN,
+        type: TransactionType.IMPORT,
         createdAt: new Date(formValues.date).toISOString(),
       },
       updateItemInput: {
