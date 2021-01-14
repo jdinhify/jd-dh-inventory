@@ -30,12 +30,16 @@ const createTransaction = async (record) =>
     const price = newImage.price.N
     const quantity = newImage.quantity.N
     const searchField = newImage.searchField.S
+    const notes = newImage.notes.S
+    const createdAt = newImage.createdAt.S
     const variables = {
       input: {
         itemId,
         price,
         quantity,
         searchField,
+        notes,
+        createdAt,
         type: 'IN',
         modelType: 'TRANSACTION',
       },

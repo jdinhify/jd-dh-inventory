@@ -10,6 +10,7 @@ export type CreateItemInput = {
   modelType: ItemModelType,
   createdAt?: string | null,
   searchField: string,
+  notes: string,
 };
 
 export enum ItemModelType {
@@ -24,6 +25,7 @@ export type ModelItemConditionInput = {
   modelType?: ModelItemModelTypeInput | null,
   createdAt?: ModelStringInput | null,
   searchField?: ModelStringInput | null,
+  notes?: ModelStringInput | null,
   and?: Array< ModelItemConditionInput | null > | null,
   or?: Array< ModelItemConditionInput | null > | null,
   not?: ModelItemConditionInput | null,
@@ -94,6 +96,7 @@ export type UpdateItemInput = {
   modelType?: ItemModelType | null,
   createdAt?: string | null,
   searchField?: string | null,
+  notes?: string | null,
 };
 
 export type DeleteItemInput = {
@@ -109,6 +112,7 @@ export type UpdateTransactionInput = {
   modelType?: TransactionModelType | null,
   createdAt?: string | null,
   searchField?: string | null,
+  notes?: string | null,
 };
 
 export enum TransactionType {
@@ -130,6 +134,7 @@ export type ModelTransactionConditionInput = {
   modelType?: ModelTransactionModelTypeInput | null,
   createdAt?: ModelStringInput | null,
   searchField?: ModelStringInput | null,
+  notes?: ModelStringInput | null,
   and?: Array< ModelTransactionConditionInput | null > | null,
   or?: Array< ModelTransactionConditionInput | null > | null,
   not?: ModelTransactionConditionInput | null,
@@ -174,6 +179,7 @@ export type CreateTransactionInput = {
   modelType: TransactionModelType,
   createdAt?: string | null,
   searchField: string,
+  notes: string,
 };
 
 export type ModelStringKeyConditionInput = {
@@ -201,6 +207,7 @@ export type ModelTransactionFilterInput = {
   modelType?: ModelTransactionModelTypeInput | null,
   createdAt?: ModelStringInput | null,
   searchField?: ModelStringInput | null,
+  notes?: ModelStringInput | null,
   and?: Array< ModelTransactionFilterInput | null > | null,
   or?: Array< ModelTransactionFilterInput | null > | null,
   not?: ModelTransactionFilterInput | null,
@@ -214,6 +221,7 @@ export type ModelItemFilterInput = {
   modelType?: ModelItemModelTypeInput | null,
   createdAt?: ModelStringInput | null,
   searchField?: ModelStringInput | null,
+  notes?: ModelStringInput | null,
   and?: Array< ModelItemFilterInput | null > | null,
   or?: Array< ModelItemFilterInput | null > | null,
   not?: ModelItemFilterInput | null,
@@ -234,6 +242,7 @@ export type CreateItemMutation = {
     modelType: ItemModelType,
     createdAt: string,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -253,6 +262,7 @@ export type UpdateItemMutation = {
     modelType: ItemModelType,
     createdAt: string,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -272,6 +282,7 @@ export type DeleteItemMutation = {
     modelType: ItemModelType,
     createdAt: string,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -300,9 +311,11 @@ export type UpdateTransactionMutation = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -331,9 +344,11 @@ export type DeleteTransactionMutation = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -362,9 +377,11 @@ export type CreateTransactionMutation = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -448,6 +465,7 @@ export type GetItemQuery = {
     modelType: ItemModelType,
     createdAt: string,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -470,6 +488,7 @@ export type ListItemsQuery = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null > | null,
     nextToken: string | null,
@@ -499,9 +518,11 @@ export type GetTransactionQuery = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -525,6 +546,7 @@ export type ListTransactionsQuery = {
       modelType: TransactionModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null > | null,
     nextToken: string | null,
@@ -552,6 +574,7 @@ export type ListItemsSortedByCreatedAtQuery = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null > | null,
     nextToken: string | null,
@@ -580,6 +603,7 @@ export type ListTransactionsSortedByCreatedAtQuery = {
       modelType: TransactionModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null > | null,
     nextToken: string | null,
@@ -596,6 +620,7 @@ export type OnCreateItemSubscription = {
     modelType: ItemModelType,
     createdAt: string,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -610,6 +635,7 @@ export type OnUpdateItemSubscription = {
     modelType: ItemModelType,
     createdAt: string,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -624,6 +650,7 @@ export type OnDeleteItemSubscription = {
     modelType: ItemModelType,
     createdAt: string,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -647,9 +674,11 @@ export type OnCreateTransactionSubscription = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -673,9 +702,11 @@ export type OnUpdateTransactionSubscription = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };
@@ -699,9 +730,11 @@ export type OnDeleteTransactionSubscription = {
       modelType: ItemModelType,
       createdAt: string,
       searchField: string,
+      notes: string,
       updatedAt: string,
     } | null,
     searchField: string,
+    notes: string,
     updatedAt: string,
   } | null,
 };

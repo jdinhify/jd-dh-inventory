@@ -15,6 +15,7 @@ export const createItem = /* GraphQL */ `
       modelType
       createdAt
       searchField
+      notes
       updatedAt
     }
   }
@@ -32,6 +33,7 @@ export const updateItem = /* GraphQL */ `
       modelType
       createdAt
       searchField
+      notes
       updatedAt
     }
   }
@@ -49,6 +51,7 @@ export const deleteItem = /* GraphQL */ `
       modelType
       createdAt
       searchField
+      notes
       updatedAt
     }
   }
@@ -74,9 +77,11 @@ export const updateTransaction = /* GraphQL */ `
         modelType
         createdAt
         searchField
+        notes
         updatedAt
       }
       searchField
+      notes
       updatedAt
     }
   }
@@ -102,9 +107,11 @@ export const deleteTransaction = /* GraphQL */ `
         modelType
         createdAt
         searchField
+        notes
         updatedAt
       }
       searchField
+      notes
       updatedAt
     }
   }
@@ -130,9 +137,11 @@ export const createTransaction = /* GraphQL */ `
         modelType
         createdAt
         searchField
+        notes
         updatedAt
       }
       searchField
+      notes
       updatedAt
     }
   }

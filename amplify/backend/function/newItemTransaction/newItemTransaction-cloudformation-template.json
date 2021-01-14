@@ -90,7 +90,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-jd-dh-inventory-dev-120504-deployment",
-          "S3Key": "amplify-builds/newItemTransaction-4f3478653335326d4156-build.zip"
+          "S3Key": "amplify-builds/newItemTransaction-51476245426c5472496a-build.zip"
         }
       }
     },
@@ -100,12 +100,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "jddhinventoryLambdaRolef79cfdd9",
+            "jddhinventoryLambdaRolef32203ce",
             {
               "Fn::Join": [
                 "",
                 [
-                  "jddhinventoryLambdaRolef79cfdd9",
+                  "jddhinventoryLambdaRolef32203ce",
                   "-",
                   {
                     "Ref": "env"

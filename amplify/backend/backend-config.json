@@ -59,6 +59,14 @@
           "resourceName": "jddhinventory",
           "attributes": [
             "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ]
+        },
+        {
+          "category": "api",
+          "resourceName": "jddhinventory",
+          "attributes": [
+            "GraphQLAPIIdOutput",
             "GraphQLAPIEndpointOutput",
             "GraphQLAPIKeyOutput"
           ]

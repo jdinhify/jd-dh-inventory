@@ -12,6 +12,7 @@ export const getItem = /* GraphQL */ `
       modelType
       createdAt
       searchField
+      notes
       updatedAt
     }
   }
@@ -31,6 +32,7 @@ export const listItems = /* GraphQL */ `
         modelType
         createdAt
         searchField
+        notes
         updatedAt
       }
       nextToken
@@ -55,9 +57,11 @@ export const getTransaction = /* GraphQL */ `
         modelType
         createdAt
         searchField
+        notes
         updatedAt
       }
       searchField
+      notes
       updatedAt
     }
   }
@@ -78,6 +82,7 @@ export const listTransactions = /* GraphQL */ `
         modelType
         createdAt
         searchField
+        notes
         updatedAt
       }
       nextToken
@@ -109,6 +114,7 @@ export const listItemsSortedByCreatedAt = /* GraphQL */ `
         modelType
         createdAt
         searchField
+        notes
         updatedAt
       }
       nextToken
@@ -141,6 +147,7 @@ export const listTransactionsSortedByCreatedAt = /* GraphQL */ `
         modelType
         createdAt
         searchField
+        notes
         updatedAt
       }
       nextToken

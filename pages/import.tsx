@@ -1,7 +1,6 @@
 import {
   Box,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   IconButton,
   Input,
@@ -47,6 +46,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { pageImportImportItem } from 'src/graphql/page-import'
 import { listItemsSortedByCreatedAt } from 'src/graphql/queries'
 import { debounce } from 'lodash'
+import { format } from 'date-fns'
 
 const importItemListQueryKey = 'import-item-list'
 
@@ -54,6 +54,9 @@ const text = {
   'Import quantity': 'Số lượng nhập',
   'Import item': 'Nhập hàng',
   Inventory: 'Kho',
+  notesLabel: 'Ghi chú (tên đơn vị nhập, lưu ý, etc...)',
+  notesPlaceholder: 'Tên đơn vị nhập, lưu ý, etc...',
+  dateLabel: 'Ngày nhập',
 }
 
 const NewItem = () => {
@@ -69,19 +72,26 @@ const NewItem = () => {
     name: string
     quantity: number
     price: number
+    notes: string
+    date: string
   }>()
   const { mutate, status: mutationStatus, reset: mutationReset } = useMutation(
     () => {
-      const values = getValues()
+      const { name, price, quantity, notes, date } = getValues()
       const input = {
         modelType: ItemModelType.ITEM,
-        name: values.name,
-        price: values.price,
-        quantity: values.quantity,
-        searchField: `${getTextWithoutAccents(values.name).toLowerCase()} ${
-          values.price
-        }`,
+        name: name,
+        price: price,
+        quantity: quantity,
+        notes: notes,
+        searchField: `${getTextWithoutAccents(
+          name,
+        ).toLowerCase()} ${price} ${getTextWithoutAccents(
+          notes,
+        ).toLowerCase()}`,
+        createdAt: new Date(date).toISOString(),
       }
+
       return gqlOp<CreateItemMutation, CreateItemMutationVariables>(
         createItem,
         {
@@ -132,7 +142,6 @@ const NewItem = () => {
                   placeholder={sharedText['Printer ink']}
                   ref={register({ required: 'Required' })}
                 />
-                <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
               </FormControl>
               <Stack direction="row">
                 <FormControl
@@ -146,9 +155,6 @@ const NewItem = () => {
                     placeholder="10"
                     ref={register({ required: 'Required' })}
                   />
-                  <FormErrorMessage>
-                    {errors.quantity?.message}
-                  </FormErrorMessage>
                 </FormControl>
                 <FormControl id="price" isInvalid={!!errors.price?.message}>
                   <FormLabel>{sharedText.Price} (K)</FormLabel>
@@ -158,9 +164,26 @@ const NewItem = () => {
                     placeholder="150"
                     ref={register({ required: 'Required' })}
                   />
-                  <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
                 </FormControl>
               </Stack>
+              <FormControl id="notes" isInvalid={!!errors.notes?.message}>
+                <FormLabel>{text.notesLabel}</FormLabel>
+                <Input
+                  type="text"
+                  name="notes"
+                  placeholder={text.notesPlaceholder}
+                  ref={register({ required: 'Required' })}
+                />
+              </FormControl>
+              <FormControl id="date" isInvalid={!!errors.date?.message}>
+                <FormLabel>{text.dateLabel}</FormLabel>
+                <Input
+                  type="date"
+                  name="date"
+                  defaultValue={format(new Date(), 'yyyy-MM-dd')}
+                  ref={register}
+                />
+              </FormControl>
             </Stack>
           </ModalBody>
 
@@ -186,15 +209,12 @@ const NewItem = () => {
   )
 }
 
-const ImportItemModal: FC<{
-  isOpen: boolean
-  id: string
-  name: string
-  quantity: number
-  price: number
-  searchField: string
-  onClose: () => void
-}> = ({ id, name, quantity, price, searchField, isOpen, onClose }) => {
+const ImportItemModal: FC<
+  {
+    isOpen: boolean
+    onClose: () => void
+  } & ListItemsSortedByCreatedAtQuery['listItemsSortedByCreatedAt']['items'][0]
+> = ({ id, name, quantity, price, searchField, notes, isOpen, onClose }) => {
   const {
     register,
     getValues,
@@ -202,8 +222,8 @@ const ImportItemModal: FC<{
     handleSubmit,
     reset: formReset,
   } = useForm<{
-    'import-price': string
     'import-quantity': string
+    date: string
   }>()
   const { status, reset, mutate } = useMutation(() => {
     const formValues = getValues()
@@ -217,7 +237,9 @@ const ImportItemModal: FC<{
         price: price,
         quantity: Number(formValues['import-quantity']),
         searchField,
+        notes,
         type: TransactionType.IN,
+        createdAt: new Date(formValues.date).toISOString(),
       },
       updateItemInput: {
         id,
@@ -250,7 +272,7 @@ const ImportItemModal: FC<{
       <ModalContent>
         <ModalHeader>{text['Import item']}</ModalHeader>
         <ModalBody>
-          <H3 marginBottom="6">{`${name} - ${price}K (${quantity})`}</H3>
+          <H3 marginBottom="6">{`${name} - ${price}K - ${notes} - (${quantity})`}</H3>
           <FormControl
             id="import-quantity"
             marginBottom="4"
@@ -265,6 +287,15 @@ const ImportItemModal: FC<{
                 required: 'Required',
                 min: { value: 0, message: 'Minimum value' },
               })}
+            />
+          </FormControl>
+          <FormControl id="date" isInvalid={!!errors.date?.message}>
+            <FormLabel>{text.dateLabel}</FormLabel>
+            <Input
+              type="date"
+              name="date"
+              defaultValue={format(new Date(), 'yyyy-MM-dd')}
+              ref={register}
             />
           </FormControl>
         </ModalBody>
@@ -285,12 +316,11 @@ const ImportItemModal: FC<{
   )
 }
 
-const Item: FC<{
-  name: string
-  quantity: number
-  price: number
-  onClick: () => void
-}> = ({ name, quantity, price, onClick }) => {
+const Item: FC<
+  {
+    onClick: () => void
+  } & ListItemsSortedByCreatedAtQuery['listItemsSortedByCreatedAt']['items'][0]
+> = ({ name, quantity, price, notes, onClick }) => {
   return (
     <Box
       display="flex"
@@ -306,7 +336,7 @@ const Item: FC<{
       <Box display="flex">
         <Text>{name}</Text>
         <Text paddingRight="2" paddingLeft="2">
-          - {`${price}K`}
+          - {`${price}K - ${notes}`}
         </Text>{' '}
       </Box>
       <Text>({quantity})</Text>

@@ -20,6 +20,7 @@ type Item
   modelType: ItemModelType!
   createdAt: AWSDateTime!
   searchField: String!
+  notes: String!
 }
 
 enum TransactionModelType {
@@ -51,4 +52,5 @@ type Transaction
   createdAt: AWSDateTime!
   item: Item @connection(fields: ["itemId"])
   searchField: String!
+  notes: String!
 }

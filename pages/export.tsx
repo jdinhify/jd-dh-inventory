@@ -40,6 +40,7 @@ import { debounce } from 'lodash'
 import { getTextWithoutAccents } from 'src/shared/get-text-without-accents'
 import { H2, H3 } from 'src/components/heading'
 import { useForm } from 'react-hook-form'
+import { format } from 'date-fns'
 
 const exportItemListQueryKey = 'export-list-items'
 
@@ -47,14 +48,16 @@ const text = {
   'Export quantity': 'Số lượng xuất',
   'Export item': 'Xuất hàng',
   Inventory: 'Kho',
+  notesLabel: 'Ghi chú (tên đơn vị xuất, lưu ý, etc...)',
+  notesPlaceholder: 'Tên đơn vị xuất, lưu ý, etc...',
+  dateLabel: 'Ngày xuất',
 }
 
-const Item: FC<{
-  name: string
-  quantity: number
-  price: number
-  onClick: () => void
-}> = ({ name, quantity, price, onClick }) => {
+const Item: FC<
+  {
+    onClick: () => void
+  } & ListItemsSortedByCreatedAtQuery['listItemsSortedByCreatedAt']['items'][0]
+> = ({ name, quantity, price, notes, onClick }) => {
   return (
     <Box
       display="flex"
@@ -70,7 +73,7 @@ const Item: FC<{
       <Box display="flex">
         <Text>{name}</Text>
         <Text paddingRight="2" paddingLeft="2">
-          - {`${price}K`}
+          - {`${price}K - ${notes}`}
         </Text>{' '}
       </Box>
       <Text>({quantity})</Text>
@@ -78,15 +81,12 @@ const Item: FC<{
   )
 }
 
-const ExportItemModal: FC<{
-  isOpen: boolean
-  id: string
-  name: string
-  quantity: number
-  price: number
-  searchField: string
-  onClose: () => void
-}> = ({ id, name, quantity, price, searchField, isOpen, onClose }) => {
+const ExportItemModal: FC<
+  {
+    isOpen: boolean
+    onClose: () => void
+  } & ListItemsSortedByCreatedAtQuery['listItemsSortedByCreatedAt']['items'][0]
+> = ({ id, name, quantity, price, searchField, notes, isOpen, onClose }) => {
   const {
     register,
     getValues,
@@ -96,6 +96,8 @@ const ExportItemModal: FC<{
   } = useForm<{
     'export-price': string
     'export-quantity': string
+    notes: string
+    date: string
   }>()
   const { status, reset, mutate } = useMutation(() => {
     const formValues = getValues()
@@ -110,6 +112,8 @@ const ExportItemModal: FC<{
         quantity: Number(formValues['export-quantity']),
         searchField: `${searchField} ${formValues['export-price']}`,
         type: TransactionType.OUT,
+        notes: formValues.notes,
+        createdAt: new Date(formValues.date).toISOString(),
       },
       updateItemInput: {
         id,
@@ -142,36 +146,57 @@ const ExportItemModal: FC<{
       <ModalContent>
         <ModalHeader>{text['Export item']}</ModalHeader>
         <ModalBody>
-          <H3 marginBottom="6">{`${name} - ${price}K (${quantity})`}</H3>
-          <FormControl
-            id="export-quantity"
-            marginBottom="4"
-            isInvalid={!!errors['export-quantity']?.message}
-          >
-            <FormLabel>{text['Export quantity']}</FormLabel>
-            <Input
-              type="number"
-              placeholder="10"
-              name="export-quantity"
-              ref={register({
-                required: 'Required',
-                min: { value: 0, message: 'Minimum value' },
-                max: { value: quantity, message: 'Maximum value' },
-              })}
-            />
-          </FormControl>
-          <FormControl
-            id="export-price"
-            isInvalid={!!errors['export-price']?.message}
-          >
-            <FormLabel>{sharedText['Export price']} (K)</FormLabel>
-            <Input
-              type="number"
-              placeholder="100"
-              name="export-price"
-              ref={register({ required: 'Required' })}
-            />
-          </FormControl>
+          <H3 marginBottom="6">{`${name} - ${price}K - ${notes} - (${quantity})`}</H3>
+          <Stack spacing="4">
+            <Stack direction="row">
+              <FormControl
+                id="export-quantity"
+                isInvalid={!!errors['export-quantity']?.message}
+              >
+                <FormLabel>{text['Export quantity']}</FormLabel>
+                <Input
+                  type="number"
+                  placeholder="10"
+                  name="export-quantity"
+                  ref={register({
+                    required: 'Required',
+                    min: { value: 0, message: 'Minimum value' },
+                    max: { value: quantity, message: 'Maximum value' },
+                  })}
+                />
+              </FormControl>
+              <FormControl
+                id="export-price"
+                isInvalid={!!errors['export-price']?.message}
+              >
+                <FormLabel>{sharedText['Export price']} (K)</FormLabel>
+                <Input
+                  type="number"
+                  placeholder="100"
+                  name="export-price"
+                  ref={register({ required: 'Required' })}
+                />
+              </FormControl>
+            </Stack>
+            <FormControl id="notes" isInvalid={!!errors.notes?.message}>
+              <FormLabel>{text.notesLabel}</FormLabel>
+              <Input
+                type="text"
+                name="notes"
+                placeholder={text.notesPlaceholder}
+                ref={register({ required: 'Required' })}
+              />
+            </FormControl>
+            <FormControl id="date" isInvalid={!!errors.date?.message}>
+              <FormLabel>{text.dateLabel}</FormLabel>
+              <Input
+                type="date"
+                name="date"
+                defaultValue={format(new Date(), 'yyyy-MM-dd')}
+                ref={register}
+              />
+            </FormControl>
+          </Stack>
         </ModalBody>
 
         <ModalFooter>
