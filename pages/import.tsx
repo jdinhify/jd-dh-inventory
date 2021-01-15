@@ -410,9 +410,7 @@ const Import = () => (
   <PageLayout activeNavItem="import">
     <SEO title="Import" />
     <PageSection>
-      <Stack>
-        <ItemList />
-      </Stack>
+      <ItemList />
     </PageSection>
   </PageLayout>
 )

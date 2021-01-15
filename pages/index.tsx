@@ -147,7 +147,6 @@ const ItemList = () => {
   const selectedTransaction = data?.data.listTransactionsSortedByCreatedAt.items.find(
     ({ id }) => id === selectedTransactionId,
   )
-  console.log({ selectedTransaction })
 
   const onSearchValueChange = debounce((text) => {
     setSearchValue(getTextWithoutAccents(text).toLowerCase())

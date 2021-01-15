@@ -245,7 +245,7 @@ const ItemList = () => {
   }, 300)
 
   return (
-    <Box>
+    <Box marginTop="8">
       <H2>{text.Inventory}</H2>
       <FormControl id="search" marginBottom="4">
         <FormLabel>{sharedText.Search}</FormLabel>
