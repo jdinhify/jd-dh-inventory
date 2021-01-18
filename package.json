@@ -16,8 +16,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsc --noEmit && lint-staged",
-      "pre-push": "npm run typecheck && npm run eslint:ci"
+      "pre-commit": "npm run typecheck && lint-staged",
+      "pre-push": "npm run typecheck && npm run eslint:ci && npm run test:ci"
     }
   },
   "lint-staged": {

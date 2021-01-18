@@ -114,7 +114,7 @@ const ExportItemModal: FC<
         quantity: getNumberValue(formValues['export-quantity']),
         searchField: `${searchField} ${getNumberValue(
           formValues['export-price'],
-        )}`,
+        )} ${getTextWithoutAccents(formValues.notes).toLowerCase()}`,
         type: TransactionType.EXPORT,
         notes: formValues.notes,
         createdAt: new Date(formValues.date).toISOString(),
