@@ -8,6 +8,7 @@
     "eslint": "eslint '{pages,src}/**/*.{js,ts,tsx}'",
     "eslint:ci": "eslint '{pages,src}/**/*.{js,ts,tsx}' --quiet",
     "typecheck": "tsc --noEmit",
+    "test": "jest --watch",
     "copy:templates": "cpy template.aws-exports.js ./src/ --rename=aws-exports.js --no-overwrite || exit 0",
     "postinstall": "npm run copy:templates",
     "semantic-release": "semantic-release"
@@ -20,7 +21,8 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [
-      "eslint --ext .js.ts.tsx --fix"
+      "eslint --ext .js.ts.tsx --fix",
+      "jest --bail --findRelatedTests"
     ],
     "*.{js,ts,tsx,css,md}": [
       "prettier --write"
@@ -43,6 +45,7 @@
     "react-query": "^3.5.9"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.20",
     "@types/node": "^14.14.19",
     "@types/react": "^16.14.2",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
@@ -58,9 +61,11 @@
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^4.3.6",
+    "jest": "^26.6.3",
     "lint-staged": "^10.5.3",
     "prettier": "^2.2.1",
     "semantic-release": "^17.3.1",
+    "ts-jest": "^26.4.4",
     "typescript": "^4.1.3",
     "vercel": "^21.0.1"
   },

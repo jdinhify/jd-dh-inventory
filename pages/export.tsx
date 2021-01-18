@@ -41,6 +41,7 @@ import { getTextWithoutAccents } from 'src/shared/get-text-without-accents'
 import { H2, H3 } from 'src/components/heading'
 import { useForm } from 'react-hook-form'
 import { format } from 'date-fns'
+import { getNumberValue } from 'src/shared/get-number-value'
 
 const exportItemListQueryKey = 'export-list-items'
 
@@ -108,8 +109,8 @@ const ExportItemModal: FC<
       createTransactionInput: {
         itemId: id,
         modelType: TransactionModelType.TRANSACTION,
-        price: Number(formValues['export-price']),
-        quantity: Number(formValues['export-quantity']),
+        price: getNumberValue(formValues['export-price']),
+        quantity: getNumberValue(formValues['export-quantity']),
         searchField: `${searchField} ${formValues['export-price']}`,
         type: TransactionType.EXPORT,
         notes: formValues.notes,
@@ -117,7 +118,7 @@ const ExportItemModal: FC<
       },
       updateItemInput: {
         id,
-        quantity: quantity - Number(formValues['export-quantity']),
+        quantity: quantity - getNumberValue(formValues['export-quantity']),
       },
     })
   })
@@ -151,34 +152,41 @@ const ExportItemModal: FC<
             <Stack direction="row">
               <FormControl
                 id="export-quantity"
-                isInvalid={!!errors['export-quantity']?.message}
+                isInvalid={!!errors['export-quantity']?.type}
               >
                 <FormLabel>{text['Export quantity']}</FormLabel>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="10"
                   name="export-quantity"
                   ref={register({
                     required: 'Required',
-                    min: { value: 0, message: 'Minimum value' },
-                    max: { value: quantity, message: 'Maximum value' },
+                    validate: (value) => {
+                      const numberValue = getNumberValue(value)
+
+                      return numberValue > 0 && numberValue <= quantity
+                    },
                   })}
                 />
               </FormControl>
               <FormControl
                 id="export-price"
-                isInvalid={!!errors['export-price']?.message}
+                isInvalid={!!errors['export-price']?.type}
               >
                 <FormLabel>{sharedText['Export price']}</FormLabel>
                 <Input
-                  type="number"
-                  placeholder="100"
+                  type="text"
+                  placeholder="100,000"
                   name="export-price"
-                  ref={register({ required: 'Required' })}
+                  ref={register({
+                    required: 'Required',
+                    validate: (value) =>
+                      Number.isInteger(getNumberValue(value)),
+                  })}
                 />
               </FormControl>
             </Stack>
-            <FormControl id="notes" isInvalid={!!errors.notes?.message}>
+            <FormControl id="notes" isInvalid={!!errors.notes?.type}>
               <FormLabel>{text.notesLabel}</FormLabel>
               <Input
                 type="text"
@@ -187,7 +195,7 @@ const ExportItemModal: FC<
                 ref={register({ required: 'Required' })}
               />
             </FormControl>
-            <FormControl id="date" isInvalid={!!errors.date?.message}>
+            <FormControl id="date" isInvalid={!!errors.date?.type}>
               <FormLabel>{text.dateLabel}</FormLabel>
               <Input
                 type="date"

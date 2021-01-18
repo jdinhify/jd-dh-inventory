@@ -47,6 +47,7 @@ import { pageImportImportItem } from 'src/graphql/page-import'
 import { listItemsSortedByCreatedAt } from 'src/graphql/queries'
 import { debounce } from 'lodash'
 import { format } from 'date-fns'
+import { getNumberValue } from 'src/shared/get-number-value'
 
 const importItemListQueryKey = 'import-item-list'
 
@@ -70,8 +71,8 @@ const NewItem = () => {
     reset: formReset,
   } = useForm<{
     name: string
-    quantity: number
-    price: number
+    quantity: string
+    price: string
     notes: string
     date: string
   }>()
@@ -81,8 +82,8 @@ const NewItem = () => {
       const input = {
         modelType: ItemModelType.ITEM,
         name: name,
-        price: price,
-        quantity: quantity,
+        price: getNumberValue(price),
+        quantity: getNumberValue(quantity),
         notes: notes,
         searchField: `${getTextWithoutAccents(
           name,
@@ -134,7 +135,7 @@ const NewItem = () => {
           <ModalHeader>{sharedText['New item']}</ModalHeader>
           <ModalBody>
             <Stack spacing="4">
-              <FormControl id="name" isInvalid={!!errors.name?.message}>
+              <FormControl id="name" isInvalid={!!errors.name?.type}>
                 <FormLabel>{sharedText.Name}</FormLabel>
                 <Input
                   type="text"
@@ -144,29 +145,34 @@ const NewItem = () => {
                 />
               </FormControl>
               <Stack direction="row">
-                <FormControl
-                  id="quantity"
-                  isInvalid={!!errors.quantity?.message}
-                >
+                <FormControl id="quantity" isInvalid={!!errors.quantity?.type}>
                   <FormLabel>{sharedText.Quantity}</FormLabel>
                   <Input
-                    type="number"
+                    type="text"
                     name="quantity"
                     placeholder="10"
-                    ref={register({ required: 'Required' })}
+                    ref={register({
+                      required: 'Required',
+                      validate: (value) =>
+                        Number.isInteger(getNumberValue(value)),
+                    })}
                   />
                 </FormControl>
-                <FormControl id="price" isInvalid={!!errors.price?.message}>
+                <FormControl id="price" isInvalid={!!errors.price?.type}>
                   <FormLabel>{sharedText.Price}</FormLabel>
                   <Input
-                    type="number"
+                    type="text"
                     name="price"
-                    placeholder="150"
-                    ref={register({ required: 'Required' })}
+                    placeholder="150,000"
+                    ref={register({
+                      required: 'Required',
+                      validate: (value) =>
+                        Number.isInteger(getNumberValue(value)),
+                    })}
                   />
                 </FormControl>
               </Stack>
-              <FormControl id="notes" isInvalid={!!errors.notes?.message}>
+              <FormControl id="notes" isInvalid={!!errors.notes?.type}>
                 <FormLabel>{text.notesLabel}</FormLabel>
                 <Input
                   type="text"
@@ -175,7 +181,7 @@ const NewItem = () => {
                   ref={register({ required: 'Required' })}
                 />
               </FormControl>
-              <FormControl id="date" isInvalid={!!errors.date?.message}>
+              <FormControl id="date" isInvalid={!!errors.date?.type}>
                 <FormLabel>{text.dateLabel}</FormLabel>
                 <Input
                   type="date"
@@ -235,7 +241,7 @@ const ImportItemModal: FC<
         itemId: id,
         modelType: TransactionModelType.TRANSACTION,
         price: price,
-        quantity: Number(formValues['import-quantity']),
+        quantity: getNumberValue(formValues['import-quantity']),
         searchField,
         notes,
         type: TransactionType.IMPORT,
@@ -243,7 +249,7 @@ const ImportItemModal: FC<
       },
       updateItemInput: {
         id,
-        quantity: quantity + Number(formValues['import-quantity']),
+        quantity: quantity + getNumberValue(formValues['import-quantity']),
       },
     })
   })
@@ -276,20 +282,20 @@ const ImportItemModal: FC<
           <FormControl
             id="import-quantity"
             marginBottom="4"
-            isInvalid={!!errors['import-quantity']?.message}
+            isInvalid={!!errors['import-quantity']?.type}
           >
             <FormLabel>{text['Import quantity']}</FormLabel>
             <Input
-              type="number"
-              placeholder="10"
+              type="string"
+              placeholder="15"
               name="import-quantity"
               ref={register({
                 required: 'Required',
-                min: { value: 0, message: 'Minimum value' },
+                validate: (value) => getNumberValue(value) > 0,
               })}
             />
           </FormControl>
-          <FormControl id="date" isInvalid={!!errors.date?.message}>
+          <FormControl id="date" isInvalid={!!errors.date?.type}>
             <FormLabel>{text.dateLabel}</FormLabel>
             <Input
               type="date"
