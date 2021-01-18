@@ -9,6 +9,7 @@
     "eslint:ci": "eslint '{pages,src}/**/*.{js,ts,tsx}' --quiet",
     "typecheck": "tsc --noEmit",
     "test": "jest --watch",
+    "test:ci": "jest --ci",
     "copy:templates": "cpy template.aws-exports.js ./src/ --rename=aws-exports.js --no-overwrite || exit 0",
     "postinstall": "npm run copy:templates",
     "semantic-release": "semantic-release"
