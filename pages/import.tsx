@@ -48,6 +48,7 @@ import { listItemsSortedByCreatedAt } from 'src/graphql/queries'
 import { debounce } from 'lodash'
 import { format } from 'date-fns'
 import { getNumberValue } from 'src/shared/get-number-value'
+import { getNumberDisplayValue } from 'src/shared/get-number-display-value'
 
 const importItemListQueryKey = 'import-item-list'
 
@@ -87,7 +88,7 @@ const NewItem = () => {
         notes: notes,
         searchField: `${getTextWithoutAccents(
           name,
-        ).toLowerCase()} ${price} ${getTextWithoutAccents(
+        ).toLowerCase()} ${getNumberValue(price)} ${getTextWithoutAccents(
           notes,
         ).toLowerCase()}`,
         createdAt: new Date(date).toISOString(),
@@ -163,7 +164,7 @@ const NewItem = () => {
                   <Input
                     type="text"
                     name="price"
-                    placeholder="150,000"
+                    placeholder="110.000"
                     ref={register({
                       required: 'Required',
                       validate: (value) =>
@@ -342,10 +343,10 @@ const Item: FC<
       <Box display="flex">
         <Text>{name}</Text>
         <Text paddingRight="2" paddingLeft="2">
-          - {`${price} - ${notes}`}
+          - {`${getNumberDisplayValue(price)} - ${notes}`}
         </Text>{' '}
       </Box>
-      <Text>({quantity})</Text>
+      <Text>({getNumberDisplayValue(quantity)})</Text>
     </Box>
   )
 }

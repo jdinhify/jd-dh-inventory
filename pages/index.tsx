@@ -46,6 +46,7 @@ import { getTextWithoutAccents } from 'src/shared/get-text-without-accents'
 import { H2, H3 } from 'src/components/heading'
 import { MdClose } from 'react-icons/md'
 import { Button } from 'src/components/button'
+import { getNumberDisplayValue } from 'src/shared/get-number-display-value'
 
 const transactionListQueryKey = 'home-transaction-list'
 
@@ -195,8 +196,14 @@ const ItemList = () => {
                   <Td>{item.notes}</Td>
                   <Td>{new Date(item.createdAt).toLocaleDateString()}</Td>
                   <Td>{item.quantity}</Td>
-                  <Td>{item.type === TransactionType.IMPORT && item.price}</Td>
-                  <Td>{item.type === TransactionType.EXPORT && item.price}</Td>
+                  <Td>
+                    {item.type === TransactionType.IMPORT &&
+                      getNumberDisplayValue(item.price)}
+                  </Td>
+                  <Td>
+                    {item.type === TransactionType.EXPORT &&
+                      getNumberDisplayValue(item.price)}
+                  </Td>
                   <Td>
                     {item.type === TransactionType.EXPORT && (
                       <IconButton

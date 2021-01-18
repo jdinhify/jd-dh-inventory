@@ -42,6 +42,7 @@ import { H2, H3 } from 'src/components/heading'
 import { useForm } from 'react-hook-form'
 import { format } from 'date-fns'
 import { getNumberValue } from 'src/shared/get-number-value'
+import { getNumberDisplayValue } from 'src/shared/get-number-display-value'
 
 const exportItemListQueryKey = 'export-list-items'
 
@@ -74,10 +75,10 @@ const Item: FC<
       <Box display="flex">
         <Text>{name}</Text>
         <Text paddingRight="2" paddingLeft="2">
-          - {`${price} - ${notes}`}
+          - {`${getNumberDisplayValue(price)} - ${notes}`}
         </Text>{' '}
       </Box>
-      <Text>({quantity})</Text>
+      <Text>({getNumberDisplayValue(quantity)})</Text>
     </Box>
   )
 }
@@ -111,7 +112,9 @@ const ExportItemModal: FC<
         modelType: TransactionModelType.TRANSACTION,
         price: getNumberValue(formValues['export-price']),
         quantity: getNumberValue(formValues['export-quantity']),
-        searchField: `${searchField} ${formValues['export-price']}`,
+        searchField: `${searchField} ${getNumberValue(
+          formValues['export-price'],
+        )}`,
         type: TransactionType.EXPORT,
         notes: formValues.notes,
         createdAt: new Date(formValues.date).toISOString(),
@@ -141,13 +144,15 @@ const ExportItemModal: FC<
     }
   }
 
-  return (
+  return !!id ? (
     <Modal isOpen={isOpen} onClose={closeModal}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{text['Export item']}</ModalHeader>
         <ModalBody>
-          <H3 marginBottom="6">{`${name} - ${price} - ${notes} - (${quantity})`}</H3>
+          <H3 marginBottom="6">{`${name} - ${getNumberDisplayValue(
+            price,
+          )} - ${notes} - (${getNumberDisplayValue(quantity)})`}</H3>
           <Stack spacing="4">
             <Stack direction="row">
               <FormControl
@@ -176,7 +181,7 @@ const ExportItemModal: FC<
                 <FormLabel>{sharedText['Export price']}</FormLabel>
                 <Input
                   type="text"
-                  placeholder="100,000"
+                  placeholder="150.000"
                   name="export-price"
                   ref={register({
                     required: 'Required',
@@ -225,7 +230,7 @@ const ExportItemModal: FC<
         </ModalFooter>
       </ModalContent>
     </Modal>
-  )
+  ) : null
 }
 
 const ItemList = () => {
