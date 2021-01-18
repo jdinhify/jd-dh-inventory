@@ -13,9 +13,11 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Stack,
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -54,6 +56,8 @@ const text = {
   revertTransactionModalHeader: 'Huỷ hoạt động',
   revertTransactionModalSubtitle: 'Xác nhận huỷ hoạt động?',
   Confirm: 'Xác nhận',
+  totalExport: 'Tổng thu',
+  totalProfit: 'Lợi nhuận',
 }
 
 const RevertTransactionModal: FC<
@@ -124,6 +128,29 @@ const RevertTransactionModal: FC<
     </Modal>
   )
 }
+
+const getTotalExport = (
+  items: PageHomeListTransactionsQuery['listTransactionsSortedByCreatedAt']['items'] = [],
+) =>
+  items
+    .filter((item) => item.type === TransactionType.EXPORT)
+    .reduce(
+      (previousValue, currentItem) =>
+        currentItem.price * currentItem.quantity + previousValue,
+      0,
+    )
+
+const getTotalExportProfit = (
+  items: PageHomeListTransactionsQuery['listTransactionsSortedByCreatedAt']['items'] = [],
+) =>
+  items
+    .filter((item) => item.type === TransactionType.EXPORT)
+    .reduce(
+      (previousValue, currentItem) =>
+        (currentItem.price - currentItem.item.price) * currentItem.quantity +
+        previousValue,
+      0,
+    )
 
 const ItemList = () => {
   const [searchValue, setSearchValue] = useState('')
@@ -225,6 +252,28 @@ const ItemList = () => {
         isOpen={!!selectedTransaction}
         onClose={() => setSelectedTransactionId(undefined)}
       />
+      <Stack direction="row" justifyContent="flex-end" marginY="8" spacing="20">
+        <Box>
+          <Text as="span">{text.totalExport}: </Text>
+          <Text as="span" marginLeft="4">
+            {getNumberDisplayValue(
+              getTotalExport(
+                data?.data.listTransactionsSortedByCreatedAt.items,
+              ),
+            )}
+          </Text>
+        </Box>
+        <Box>
+          <Text as="span">{text.totalProfit}: </Text>
+          <Text as="span" marginLeft="4">
+            {getNumberDisplayValue(
+              getTotalExportProfit(
+                data?.data.listTransactionsSortedByCreatedAt.items,
+              ),
+            )}
+          </Text>
+        </Box>
+      </Stack>
     </Box>
   )
 }
